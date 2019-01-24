@@ -3,7 +3,9 @@ suites:
     namespace: App
     psr4_prefix: App
     src_path: app
-
+extensions:
+  PhpSpec\Laravel\Extension\LaravelExtension:
+    testing_environment: "testing"
 # extensions:
 #   LeanPHP\PhpSpec\CodeCoverage\CodeCoverageExtension:
 #     format:
