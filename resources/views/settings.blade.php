@@ -18,10 +18,18 @@
                           {!! Form::open(array('url' => 'settings')) !!}
                           <div class="row p-1">
                             <div class="col-sm col-lg-4">
-                              {!! Form::label('key', 'Active Campaign API key') !!}
+                              {!! Form::label('activecampaign_account', 'Active Campaign account ID') !!}
                             </div>
                             <div class="col-sm">
-                              {!! Form::text('key', 'banan & beard') !!}
+                              {!! Form::text('activecampaign_account', $activecampaign_account) !!}
+                            </div>
+                          </div>
+                          <div class="row p-1">
+                            <div class="col-sm col-lg-4">
+                              {!! Form::label('activecampaign_token', 'Active Campaign API key') !!}
+                            </div>
+                            <div class="col-sm">
+                              {!! Form::text('activecampaign_token', $activecampaign_token) !!}
                             </div>
                           </div>
                           <div class="row p-1">

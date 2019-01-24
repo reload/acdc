@@ -64,7 +64,6 @@ class LoginController extends Controller
 
         // Only allow people with a @reload.dk email to login.
         if (explode("@", $user->email)[1] == 'reload.dk') {
-
             $existingUser = User::where('email', $user->email)->first();
 
             if ($existingUser) {
