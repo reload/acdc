@@ -16,5 +16,6 @@ Route::get('/callback', 'Auth\LoginController@handleProviderCallback');
 Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 
 Route::get('/settings', 'SettingsController@view')->name('settings');
+Route::post('/settings/save', 'SettingsController@save');
 
 Route::get('/', 'HomeController@index')->name('home');
