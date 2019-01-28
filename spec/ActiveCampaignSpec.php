@@ -5,10 +5,10 @@ namespace spec\App;
 use App\ActiveCampaign;
 use Exception;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Psr7\Response;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
+use RuntimeException;
 
 class ActiveCampaignSpec extends ObjectBehavior
 {
@@ -46,12 +46,43 @@ class ActiveCampaignSpec extends ObjectBehavior
 
     function it_should_throw_early_with_empty_creds(Client $client)
     {
-        $this->shouldThrow(TransferException::class)->during('ping');
+        $this->shouldThrow(RuntimeException::class)->during('ping');
     }
 
     function it_allows_for_changing_creds(Client $client)
     {
         $expected = new ActiveCampaign($client->getWrappedObject(), '789', '012');
         $this->withCreds('789', '012')->shouldBeLike($expected);
+    }
+
+    function it_should_get_deals(Client $client)
+    {
+        $this->beConstructedWith($client, '123', '456');
+        $headers = [
+            'Api-Token' => '456',
+        ];
+        //https://1499693424850.api-us1.com/api/3/deals/500
+        $apiResponse = [
+            'deal' => [
+                'id' => 789,
+            ],
+        ];
+        $response = new Response(200, [], json_encode($apiResponse));
+        $client->request('GET', 'https://123.api-us1.com/api/3/deals/789', ['headers' => $headers])->willReturn($response);
+        $this->get(789)->shouldReturn(['id' => 789]);
+    }
+
+    function it_should_deal_with_bad_responses(Client $client)
+    {
+        $this->beConstructedWith($client, '123', '456');
+        $headers = [
+            'Api-Token' => '456',
+        ];
+
+        $apiResponse = [];
+
+        $response = new Response(200, [], json_encode($apiResponse));
+        $client->request('GET', 'https://123.api-us1.com/api/3/deals/789', ['headers' => $headers])->willReturn($response);
+        $this->shouldThrow(RuntimeException::class)->during('get', [789]);
     }
 }

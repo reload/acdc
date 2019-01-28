@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "282b9a88f04bef4e2d8b1b10de401b4d",
+    "content-hash": "22f530bb08d99f60bed14465368b766c",
     "packages": [
         {
             "name": "benconstable/phpspec-laravel",

@@ -3,7 +3,7 @@
 namespace App;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\TransferException;
+use RuntimeException;
 
 class ActiveCampaign
 {
@@ -25,7 +25,7 @@ class ActiveCampaign
     protected function call(string $method, string $path = '')
     {
         if (empty($this->account) || empty($this->token)) {
-            throw new TransferException('Empty account/token');
+            throw new RuntimeException('Empty account/token');
         }
         return $this->client->request($method, $this->getUrl($path), ['headers' => [
             'Api-Token' => $this->token,
@@ -43,5 +43,15 @@ class ActiveCampaign
     public function withCreds($account, $token)
     {
         return new self($this->client, $account, $token);
+    }
+
+    public function get($dealId)
+    {
+        $response = $this->call('GET', 'deals/' . $dealId);
+        $data =json_decode($response->getBody(), true);
+        if (!isset($data['deal'])) {
+            throw new RuntimeException('Could not get deal data');
+        }
+        return $data['deal'];
     }
 }
