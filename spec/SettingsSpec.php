@@ -26,4 +26,15 @@ class SettingsSpec extends LaravelObjectBehavior
         $this->set('setting name2', 'setting value')->shouldReturn(null);
         $this->get('setting name2')->shouldReturn('setting value');
     }
+
+    function it_supports_non_string_values()
+    {
+        $this->set('setting name3', ['a' => 1, 'b' => 2])->shouldReturn(null);
+        $this->get('setting name3')->shouldReturn(['a' => 1, 'b' => 2]);
+    }
+
+    function it_returns_null_for_undefined_settings()
+    {
+        $this->get('setting name4')->shouldReturn(null);
+    }
 }

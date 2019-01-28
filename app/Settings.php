@@ -11,7 +11,7 @@ class Settings
      */
     public function set(string $name, $value)
     {
-        $account = DB::table('settings')->updateOrInsert(['name' => $name], ['value' => $value]);
+        $account = DB::table('settings')->updateOrInsert(['name' => $name], ['value' => serialize($value)]);
     }
 
     /**
@@ -19,6 +19,7 @@ class Settings
      */
     public function get(string $name)
     {
-        return DB::table('settings')->where('name', $name)->value('value');
+        $value = DB::table('settings')->where('name', $name)->value('value');
+        return \is_string($value) ? unserialize($value) : null;
     }
 }
