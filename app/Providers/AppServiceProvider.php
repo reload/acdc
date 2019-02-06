@@ -30,8 +30,8 @@ class AppServiceProvider extends ServiceProvider
             $settings = $app->make(Settings::class);
             return new ActiveCampaign(
                 $app->make(Client::class),
-                $settings->get('activecampaign_account'),
-                $settings->get('activecampaign_token')
+                env('ACTIVECAMPAIGN_ACCOUNT', ''),
+                env('ACTIVECAMPAIGN_TOKEN', '')
             );
         });
     }

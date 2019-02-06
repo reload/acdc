@@ -18,7 +18,8 @@ class ActiveCampaign
         $this->token = (string) $token;
     }
 
-    protected function getUrl(string $path = '') {
+    protected function getUrl(string $path = '')
+    {
         return 'https://' . $this->account . '.api-us1.com/api/3/' . $path;
     }
 
