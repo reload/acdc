@@ -3,6 +3,8 @@
 namespace App;
 
 use Google_Service_Sheets;
+use Google_Service_Sheets_ValueRange;
+use RuntimeException;
 use Throwable;
 
 class Sheets
@@ -117,5 +119,66 @@ class Sheets
         } catch (Throwable $e) {
             return null;
         }
+    }
+
+    /**
+     * Append row to sheet.
+     *
+     * @param string $spreadsheetId
+     *   Id of spreadsheet.
+     * @param string $sheet
+     *   Id of sheet.
+     * @param array $row
+     *   Array of values for the new row.
+     */
+    public function appendRow(string $spreadsheetId, string $sheetId, array $row)
+    {
+        $options = ['valueInputOption' => 'USER_ENTERED'];
+        $values = new Google_Service_Sheets_ValueRange(['values' => [$row]]);
+        $result = $this->sheets->spreadsheets_values->append(
+            $spreadsheetId,
+            sprintf("'%s'!%s%d:%s%d", $sheetId, 'A', 1,  $this->columnLetter(count($row)), 1),
+            $values,
+            $options
+        );
+    }
+
+    /**
+     * Update row in sheet.
+     *
+     * @param string $spreadsheetId
+     *   Id of spreadsheet.
+     * @param string $sheet
+     *   Id of sheet.
+     * @param int $rowNum
+     *   Row number to update.
+     * @param array $row
+     *   Array of values for the new row.
+     */
+    public function updateRow(string $spreadsheetId, string $sheetId, int $rowNum, array $row)
+    {
+        $options = ['valueInputOption' => 'USER_ENTERED'];
+        $values = new Google_Service_Sheets_ValueRange(['values' => [$row]]);
+        $result = $this->sheets->spreadsheets_values->update(
+            $spreadsheetId,
+            sprintf("'%s'!%s%d:%s%d", $sheetId, 'A', $rowNum, $this->columnLetter(count($row)), $rowNum),
+            $values,
+            $options
+        );
+    }
+
+    /**
+     * Get column letter.
+     *
+     * @param int $colNum
+     *   Column number.
+     */
+    protected function columnLetter($colNum)
+    {
+        if ($colNum > 24) {
+            throw new RuntimeException('At most 24 columns supported at the moment.');
+        }
+
+        return chr($colNum + 64);
     }
 }

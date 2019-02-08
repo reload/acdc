@@ -7,6 +7,7 @@ use Exception;
 use Google_Service_Sheets;
 use Google_Service_Sheets_Resource_Spreadsheets;
 use Google_Service_Sheets_Resource_SpreadsheetsValues;
+use Google_Service_Sheets_ValueRange;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -84,5 +85,37 @@ class SheetsSpec extends ObjectBehavior
         $sheets->spreadsheets_values = $values;
 
         $this->data('spreadsheet-id', 'le sheet')->shouldReturn($rows);
+    }
+
+    function it_should_append_row(
+        Google_Service_Sheets $sheets,
+        Google_Service_Sheets_Resource_SpreadsheetsValues $values
+    ) {
+        $valueRange = new Google_Service_Sheets_ValueRange(['values' => [['one', 'two']]]);
+
+        $values->append(
+            'spreadsheet-id',
+            "'le sheet'!A1:B1",
+            $valueRange,
+            ['valueInputOption' => 'USER_ENTERED']
+        )->shouldBeCalled();
+        $sheets->spreadsheets_values = $values;
+        $this->appendRow('spreadsheet-id', 'le sheet', ['one' , 'two']);
+    }
+
+    function it_should_update_row(
+        Google_Service_Sheets $sheets,
+        Google_Service_Sheets_Resource_SpreadsheetsValues $values
+    ) {
+        $valueRange = new Google_Service_Sheets_ValueRange(['values' => [['one', 'two']]]);
+
+        $values->update(
+            'spreadsheet-id',
+            "'le sheet'!A3:B3",
+            $valueRange,
+            ['valueInputOption' => 'USER_ENTERED']
+        )->shouldBeCalled();
+        $sheets->spreadsheets_values = $values;
+        $this->updateRow('spreadsheet-id', 'le sheet', 3, ['one' , 'two']);
     }
 }
