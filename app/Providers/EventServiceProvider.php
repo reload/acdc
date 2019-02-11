@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Events\DealUpdated;
 use App\Listeners\DealUpdatedLogger;
+use App\Listeners\UpdateSheets;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -19,6 +20,7 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         DealUpdated::class => [
             DealUpdatedLogger::class,
+            UpdateSheets::class
         ],
     ];
 
