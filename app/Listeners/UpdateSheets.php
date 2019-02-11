@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Yaml\Yaml;
+use Throwable;
 
 class UpdateSheets
 {
@@ -35,11 +36,15 @@ class UpdateSheets
      */
     public function handle(DealUpdated $event)
     {
-        $deal = $this->activeCampaign->get($event->dealId);
-
-        $mapping = YAML::parse(env('MAPPING', ''));
+        try {
+            $deal = $this->activeCampaign->get($event->dealId);
+        } catch (Throwable $e) {
+            Log::error(sprintf('Error fetching deal %d: %s', $event->dealId, $e->getMessage()));
+            return;
+        }
+        $mapping = YAML::parse(strtr(env('MAPPING', ''), ['\n' => "\n"]));
         if (!is_array($mapping)) {
-            throw new MapperException('Mapping should be an array of mappings');
+            throw new MapperException('Mapping should be an array of mappings.');
         }
         foreach ($mapping as $map) {
             try {
@@ -51,6 +56,9 @@ class UpdateSheets
                 // See if the row exists.
                 $idCol = $map['map']['id'] - 1;
                 $sheetData = $this->sheets->data($map['sheet'], $map['tab']);
+                if (!$sheetData) {
+                    throw new MapperException('Error fetching data from Sheets.');
+                }
                 $ids = array_map(function ($row) use ($idCol) {
                     return isset($row[$idCol]) ? $row[$idCol] : null;
                 }, $sheetData);
@@ -59,8 +67,10 @@ class UpdateSheets
                 $rowNum = array_search($deal['id'], $ids);
                 if ($rowNum !== false) {
                     $this->sheets->updateRow($map['sheet'], $map['tab'], $rowNum + 1, $values);
+                    Log::info(sprintf("Updated deal %d in Sheets.", $deal['id']));
                 } else {
                     $this->sheets->appendRow($map['sheet'], $map['tab'], $values);
+                    Log::info(sprintf("Added deal %d to Sheets.", $deal['id']));
                 }
             } catch (MapperException $e) {
                 // Use json for logging as it's one line.

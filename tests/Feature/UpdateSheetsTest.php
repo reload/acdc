@@ -8,6 +8,7 @@ use App\Exceptions\MapperException;
 use App\Listeners\UpdateSheets;
 use App\Sheets;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 use Symfony\Component\Yaml\Yaml;
 use Tests\TestCase;
 
@@ -16,6 +17,8 @@ class UpdateSheetsTest extends TestCase
     public function testMissingMapping()
     {
         $this->expectException(MapperException::class);
+
+        putenv('MAPPING=');
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $sheets = $this->prophesize(Sheets::class);
@@ -56,6 +59,7 @@ class UpdateSheetsTest extends TestCase
     public function testMissingField()
     {
         Log::shouldReceive("error")->with('Unknown field "banana".')->once();
+        Log::shouldReceive("info");
 
         $deal = [
             'id' => '500',
@@ -78,7 +82,7 @@ class UpdateSheetsTest extends TestCase
         $ac->get(42)->willReturn($deal);
 
         $sheets = $this->prophesize(Sheets::class);
-        $sheets->data('the-sheet', 'the-tab')->willReturn([]);
+        $sheets->data('the-sheet', 'the-tab')->willReturn([[]]);
 
         $sheets->appendRow('the-sheet', 'the-tab', [500, ''])->shouldBeCalled();
 
@@ -156,7 +160,7 @@ class UpdateSheetsTest extends TestCase
         $ac->get(42)->willReturn($deal);
 
         $sheets = $this->prophesize(Sheets::class);
-        $sheets->data('the-sheet', 'the-tab')->willReturn([]);
+        $sheets->data('the-sheet', 'the-tab')->willReturn([[]]);
 
         $sheets->appendRow('the-sheet', 'the-tab', [500])->shouldBeCalled();
 
@@ -198,6 +202,31 @@ class UpdateSheetsTest extends TestCase
         $sheets->data('the-sheet', 'the-tab')->willReturn($sheet);
 
         $sheets->updateRow('the-sheet', 'the-tab', 2, ['new name', 500])->shouldBeCalled();
+
+        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+        $updater->handle(new DealUpdated(42));
+    }
+
+    public function testCatchingErrorsInAC()
+    {
+        $mapping = [
+            [
+                'sheet' => 'the-sheet',
+                'tab' => 'the-tab',
+                'map' => [
+                    'id' => 1,
+                ]
+            ],
+        ];
+
+        Log::shouldReceive("error")->with('Error fetching deal 42: bad stuff')->once();
+
+        putenv('MAPPING=' . YAML::dump($mapping));
+
+        $ac = $this->prophesize(ActiveCampaign::class);
+        $ac->get(42)->willThrow(new RuntimeException('bad stuff'));
+
+        $sheets = $this->prophesize(Sheets::class);
 
         $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
         $updater->handle(new DealUpdated(42));
