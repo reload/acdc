@@ -28,9 +28,10 @@ class ActiveCampaign
         if (empty($this->account) || empty($this->token)) {
             throw new RuntimeException('Empty account/token');
         }
-        return $this->client->request($method, $this->getUrl($path), ['headers' => [
+        $response = $this->client->request($method, $this->getUrl($path), ['headers' => [
             'Api-Token' => $this->token,
         ]]);
+        return json_decode($response->getBody(), true);
     }
 
     public function ping()
@@ -48,16 +49,14 @@ class ActiveCampaign
 
     public function get($dealId)
     {
-        $response = $this->call('GET', 'deals/' . $dealId);
-        $data = json_decode($response->getBody(), true);
+        $data = $this->call('GET', 'deals/' . $dealId);
         if (!isset($data['deal'])) {
             throw new RuntimeException('Could not get deal data for ' . $dealId);
         }
         $deal = $data['deal'];
 
         // Fetch custom fields.
-        $response = $this->call('GET', 'deals/' . $dealId . '/dealCustomFieldData');
-        $data = json_decode($response->getBody(), true);
+        $data = $this->call('GET', 'deals/' . $dealId . '/dealCustomFieldData');
         if (!isset($data['dealCustomFieldData'])) {
             throw new RuntimeException('Could not get deal custom fields on ' . $dealId);
         }
