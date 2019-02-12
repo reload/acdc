@@ -61,7 +61,7 @@ class ActiveCampaignSpec extends ObjectBehavior
         $headers = [
             'Api-Token' => '456',
         ];
-        //https://1499693424850.api-us1.com/api/3/deals/500
+        //https://1499693424850.api-us1.com/api/3/deals/789
         $apiResponse = [
             'deal' => [
                 'id' => 789,
@@ -69,6 +69,12 @@ class ActiveCampaignSpec extends ObjectBehavior
         ];
         $response = new Response(200, [], json_encode($apiResponse));
         $client->request('GET', 'https://123.api-us1.com/api/3/deals/789', ['headers' => $headers])->willReturn($response);
+
+        // https://1499693424850.api-us1.com/api/3/deals/789/dealCustomFieldData
+        $apiResponse = ['dealCustomFieldData' => []];
+        $response = new Response(200, [], json_encode($apiResponse));
+        $client->request('GET', 'https://123.api-us1.com/api/3/deals/789/dealCustomFieldData', ['headers' => $headers])->willReturn($response);
+
         $this->get(789)->shouldReturn(['id' => 789]);
     }
 
@@ -84,5 +90,49 @@ class ActiveCampaignSpec extends ObjectBehavior
         $response = new Response(200, [], json_encode($apiResponse));
         $client->request('GET', 'https://123.api-us1.com/api/3/deals/789', ['headers' => $headers])->willReturn($response);
         $this->shouldThrow(RuntimeException::class)->during('get', [789]);
+    }
+
+    function it_should_add_custom_fields(Client $client)
+    {
+        $this->beConstructedWith($client, '123', '456');
+        $headers = [
+            'Api-Token' => '456',
+        ];
+        // https://1499693424850.api-us1.com/api/3/deals/789
+        $apiResponse = [
+            'deal' => [
+                'id' => 789,
+            ],
+        ];
+        $response = new Response(200, [], json_encode($apiResponse));
+        $client->request('GET', 'https://123.api-us1.com/api/3/deals/789', ['headers' => $headers])->willReturn($response);
+
+        // https://1499693424850.api-us1.com/api/3/deals/789/dealCustomFieldData
+        $apiResponse = [
+            'dealCustomFieldData' => [
+                [
+                    'customFieldId' => 1,
+                    'fieldValue' => '3',
+                ],
+                [
+                    'customFieldId' => 2,
+                    'fieldValue' => '5',
+                ],
+                [
+                    'customFieldId' => 3,
+                    'fieldValue' => '7',
+                ]
+            ]
+        ];
+        $response = new Response(200, [], json_encode($apiResponse));
+        $client->request('GET', 'https://123.api-us1.com/api/3/deals/789/dealCustomFieldData', ['headers' => $headers])->willReturn($response);
+
+        $expected = [
+            'id' => 789,
+            'custom_field_1' => '3',
+            'custom_field_2' => '5',
+            'custom_field_3' => '7',
+        ];
+        $this->get(789)->shouldReturn($expected);
     }
 }

@@ -49,10 +49,25 @@ class ActiveCampaign
     public function get($dealId)
     {
         $response = $this->call('GET', 'deals/' . $dealId);
-        $data =json_decode($response->getBody(), true);
+        $data = json_decode($response->getBody(), true);
         if (!isset($data['deal'])) {
-            throw new RuntimeException('Could not get deal data');
+            throw new RuntimeException('Could not get deal data for ' . $dealId);
         }
-        return $data['deal'];
+        $deal = $data['deal'];
+
+        // Fetch custom fields.
+        $response = $this->call('GET', 'deals/' . $dealId . '/dealCustomFieldData');
+        $data = json_decode($response->getBody(), true);
+        if (!isset($data['dealCustomFieldData'])) {
+            throw new RuntimeException('Could not get deal custom fields on ' . $dealId);
+        }
+        foreach ($data['dealCustomFieldData'] as $customField) {
+            if (!isset($customField['customFieldId']) || !isset($customField['fieldValue'])) {
+                throw new RuntimeException('Malformed custom field response on deal ' . $dealId);
+            }
+            $deal['custom_field_' . $customField['customFieldId']] = $customField['fieldValue'];
+        }
+
+        return $deal;
     }
 }
