@@ -18,7 +18,7 @@ class UpdateSheetsTest extends TestCase
     {
         $this->expectException(MapperException::class);
 
-        putenv('MAPPING=');
+        putenv('SHEETS=');
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $sheets = $this->prophesize(Sheets::class);
@@ -42,7 +42,7 @@ class UpdateSheetsTest extends TestCase
 
         Log::shouldReceive("error")->with('Error "The "id" field must be mapped." while mapping {"sheet":"the-sheet","tab":"the-tab"}')->once();
 
-        putenv('MAPPING=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($mapping));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
@@ -70,7 +70,7 @@ class UpdateSheetsTest extends TestCase
             ],
         ];
 
-        putenv('MAPPING=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($mapping));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
@@ -174,7 +174,7 @@ class UpdateSheetsTest extends TestCase
             ],
         ];
 
-        putenv('MAPPING=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($mapping));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
@@ -210,7 +210,7 @@ class UpdateSheetsTest extends TestCase
             ],
         ];
 
-        putenv('MAPPING=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($mapping));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
@@ -239,7 +239,7 @@ class UpdateSheetsTest extends TestCase
 
         Log::shouldReceive("error")->with('Error fetching deal 42: bad stuff')->once();
 
-        putenv('MAPPING=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($mapping));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willThrow(new RuntimeException('bad stuff'));

@@ -42,7 +42,7 @@ class UpdateSheets
             Log::error(sprintf('Error fetching deal %d: %s', $event->dealId, $e->getMessage()));
             return;
         }
-        $mapping = YAML::parse(strtr(env('MAPPING', ''), ['\n' => "\n"]));
+        $mapping = YAML::parse(strtr(env('SHEETS', ''), ['\n' => "\n"]));
         if (!is_array($mapping)) {
             throw new MapperException('Mapping should be an array of mappings.');
         }
