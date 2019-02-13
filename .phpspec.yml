@@ -6,12 +6,11 @@ suites:
 extensions:
   PhpSpec\Laravel\Extension\LaravelExtension:
     testing_environment: "testing"
-# extensions:
-#   LeanPHP\PhpSpec\CodeCoverage\CodeCoverageExtension:
-#     format:
-#       - php
-#     output:
-#       php: coverage/spec.cov
-#     whitelist:
-#       - app
+  LeanPHP\PhpSpec\CodeCoverage\CodeCoverageExtension:
+    format:
+      - php
+    output:
+      php: coverage/spec.cov
+    whitelist:
+      - app
 formatter.name: pretty

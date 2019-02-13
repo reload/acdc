@@ -1,0 +1,25 @@
+language: php
+
+php:
+  - '7.2'
+
+env:
+  global:
+    - APP_KEY=base64:Z++HhObkg1plehwZlK6RGSRVi4uWPiUGRYFoDOt2/Ig=
+    - DB_CONNECTION=sqlite
+    - DB_DATABASE="/tmp/acdc.sqlite"
+    - LOG_CHANNEL=errorlog
+    - APP_ENV=testing
+    
+install: composer install --prefer-source
+
+script:
+  - mkdir coverage
+  - touch /tmp/acdc.sqlite
+  - ./artisan migrate
+  - ./vendor/bin/phpspec run
+  - ./vendor/bin/phpcov merge --clover=clover.xml coverage/
+  - bash <(curl -s https://codecov.io/bash) -c -F spec
+  - ./vendor/bin/phpunit --coverage-php=coverage/unit.cov
+  - ./vendor/bin/phpcov merge --clover=clover.xml coverage/
+  - bash <(curl -s https://codecov.io/bash) -c -F unit
