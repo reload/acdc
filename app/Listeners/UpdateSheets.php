@@ -50,11 +50,16 @@ class UpdateSheets
             try {
                 $this->validateMapping($map);
 
+                $fieldMapping = $this->sheets->header($map['sheet'], $map['tab']);
+                if (!in_array('id', $fieldMapping)) {
+                    throw new MapperException('The "id" field must be mapped.');
+                }
+
                 // Create new row.
-                $values = $this->map($this->translateFields($deal), $map['map']);
+                $values = $this->map($this->translateFields($deal), $fieldMapping);
 
                 // See if the row exists.
-                $idCol = $map['map']['id'] - 1;
+                $idCol = array_search('id', $fieldMapping);
                 $sheetData = $this->sheets->data($map['sheet'], $map['tab']);
                 if (!$sheetData) {
                     throw new MapperException('Error fetching data from Sheets.');
@@ -81,12 +86,11 @@ class UpdateSheets
 
     public function map($deal, $map)
     {
-        $colMapping = array_flip($map);
         $values = [];
-        for ($i = 0; $i < max(array_keys($colMapping)); $i++) {
+        for ($i = 0; $i <= max(array_keys($map)); $i++) {
             $value = '';
-            if (isset($colMapping[$i+1])) {
-                $field = $colMapping[$i+1];
+            if (isset($map[$i])) {
+                $field = $map[$i];
                 if (isset($deal[$field])) {
                     $value = $deal[$field];
                 } else {
@@ -100,19 +104,11 @@ class UpdateSheets
 
     protected function validateMapping($map)
     {
-        if (array_keys($map) != ['sheet', 'tab', 'map']) {
-            throw new MapperException('Each mapping should contain "sheet", "tab" and "map", and nothing else.');
+        if (array_keys($map) != ['sheet', 'tab']) {
+            throw new MapperException('Each mapping should contain "sheet" and "tab", and nothing else.');
         }
         if (!is_string($map['sheet']) || !is_string($map['tab'])) {
             throw new MapperException('Sheet and tab of each mapping should be a string.');
-        }
-        foreach ($map['map'] as $key => $val) {
-            if (!is_string($key) || !is_int($val)) {
-                throw new MapperException('Map should consist of string => int pairs.');
-            }
-        }
-        if (!isset($map['map']['id'])) {
-            throw new MapperException('The "id" field must be mapped.');
         }
     }
 
