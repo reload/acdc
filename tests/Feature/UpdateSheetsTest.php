@@ -18,7 +18,7 @@ class UpdateSheetsTest extends TestCase
     {
         $this->expectException(MapperException::class);
 
-        putenv('MAPPING=');
+        putenv('SHEETS=');
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $sheets = $this->prophesize(Sheets::class);
@@ -37,20 +37,18 @@ class UpdateSheetsTest extends TestCase
             [
                 'sheet' => 'the-sheet',
                 'tab' => 'the-tab',
-                'map' => [
-                    'banana' => 1,
-                ]
             ],
         ];
 
-        Log::shouldReceive("error")->with('Error "The "id" field must be mapped." while mapping {"sheet":"the-sheet","tab":"the-tab","map":{"banana":1}}')->once();
+        Log::shouldReceive("error")->with('Error "The "id" field must be mapped." while mapping {"sheet":"the-sheet","tab":"the-tab"}')->once();
 
-        putenv('MAPPING=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($mapping));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
 
         $sheets = $this->prophesize(Sheets::class);
+        $sheets->header('the-sheet', 'the-tab')->willReturn(['banana']);
 
         $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
         $updater->handle(new DealUpdated(42));
@@ -69,19 +67,16 @@ class UpdateSheetsTest extends TestCase
             [
                 'sheet' => 'the-sheet',
                 'tab' => 'the-tab',
-                'map' => [
-                    'id' => 1,
-                    'banana' => 2,
-                ]
             ],
         ];
 
-        putenv('MAPPING=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($mapping));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
 
         $sheets = $this->prophesize(Sheets::class);
+        $sheets->header('the-sheet', 'the-tab')->willReturn(['id', 'banana']);
         $sheets->data('the-sheet', 'the-tab')->willReturn([[]]);
 
         $sheets->appendRow('the-sheet', 'the-tab', [500, ''])->shouldBeCalled();
@@ -107,11 +102,11 @@ class UpdateSheetsTest extends TestCase
             'ignored' => 'none',
         ];
         $map = [
-            'id' => 2,
-            'name' => 1,
+            2 => 'id',
+            1 => 'name',
         ];
 
-        $this->assertEquals(['banana', 12], $updater->map($deal, $map));
+        $this->assertEquals(['', 'banana', 12], $updater->map($deal, $map));
 
         $deal = [
             'id' => 12,
@@ -119,8 +114,8 @@ class UpdateSheetsTest extends TestCase
             'ignored' => 'none',
         ];
         $map = [
-            'id' => 2,
-            'name' => 4,
+            1 => 'id',
+            3 => 'name',
         ];
 
         $this->assertEquals(['', 12, '', 'banana'], $updater->map($deal, $map));
@@ -130,8 +125,8 @@ class UpdateSheetsTest extends TestCase
             'ignored' => 'none',
         ];
         $map = [
-            'id' => 2,
-            'name' => 4,
+            1 => 'id',
+            3 => 'name',
         ];
 
         $this->assertEquals(['', 12, '', ''], $updater->map($deal, $map));
@@ -176,19 +171,16 @@ class UpdateSheetsTest extends TestCase
             [
                 'sheet' => 'the-sheet',
                 'tab' => 'the-tab',
-                'map' => [
-                    'id' => 1,
-                    'cdate' => 2
-                ]
             ],
         ];
 
-        putenv('MAPPING=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($mapping));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
 
         $sheets = $this->prophesize(Sheets::class);
+        $sheets->header('the-sheet', 'the-tab')->willReturn(['id', 'cdate']);
         $sheets->data('the-sheet', 'the-tab')->willReturn([[]]);
 
         $sheets->appendRow('the-sheet', 'the-tab', [500, '2019-02-13 09:12:08'])->shouldBeCalled();
@@ -215,19 +207,16 @@ class UpdateSheetsTest extends TestCase
             [
                 'sheet' => 'the-sheet',
                 'tab' => 'the-tab',
-                'map' => [
-                    'id' => 2,
-                    'name' => 1,
-                ]
             ],
         ];
 
-        putenv('MAPPING=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($mapping));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
 
         $sheets = $this->prophesize(Sheets::class);
+        $sheets->header('the-sheet', 'the-tab')->willReturn(['name', 'id']);
         $sheets->data('the-sheet', 'the-tab')->willReturn($sheet);
 
         $sheets->updateRow('the-sheet', 'the-tab', 2, ['new name', 500])->shouldBeCalled();
@@ -250,7 +239,7 @@ class UpdateSheetsTest extends TestCase
 
         Log::shouldReceive("error")->with('Error fetching deal 42: bad stuff')->once();
 
-        putenv('MAPPING=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($mapping));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willThrow(new RuntimeException('bad stuff'));

@@ -42,20 +42,25 @@ class UpdateSheets
             Log::error(sprintf('Error fetching deal %d: %s', $event->dealId, $e->getMessage()));
             return;
         }
-        $mapping = YAML::parse(strtr(env('MAPPING', ''), ['\n' => "\n"]));
-        if (!is_array($mapping)) {
-            throw new MapperException('Mapping should be an array of mappings.');
+        $sheets = YAML::parse(strtr(env('SHEETS', ''), ['\n' => "\n"]));
+        if (!is_array($sheets)) {
+            throw new MapperException('SHEETS should be an array of sheet specs.');
         }
-        foreach ($mapping as $map) {
+        foreach ($sheets as $sheet) {
             try {
-                $this->validateMapping($map);
+                $this->validateMapping($sheet);
+
+                $fieldMapping = $this->sheets->header($sheet['sheet'], $sheet['tab']);
+                if (!in_array('id', $fieldMapping)) {
+                    throw new MapperException('The "id" field must be mapped.');
+                }
 
                 // Create new row.
-                $values = $this->map($this->translateFields($deal), $map['map']);
+                $values = $this->map($this->translateFields($deal), $fieldMapping);
 
                 // See if the row exists.
-                $idCol = $map['map']['id'] - 1;
-                $sheetData = $this->sheets->data($map['sheet'], $map['tab']);
+                $idCol = array_search('id', $fieldMapping);
+                $sheetData = $this->sheets->data($sheet['sheet'], $sheet['tab']);
                 if (!$sheetData) {
                     throw new MapperException('Error fetching data from Sheets.');
                 }
@@ -66,27 +71,26 @@ class UpdateSheets
                 // Update or add the row.
                 $rowNum = array_search($deal['id'], $ids);
                 if ($rowNum !== false) {
-                    $this->sheets->updateRow($map['sheet'], $map['tab'], $rowNum + 1, $values);
+                    $this->sheets->updateRow($sheet['sheet'], $sheet['tab'], $rowNum + 1, $values);
                     Log::info(sprintf("Updated deal %d in Sheets.", $deal['id']));
                 } else {
-                    $this->sheets->appendRow($map['sheet'], $map['tab'], $values);
+                    $this->sheets->appendRow($sheet['sheet'], $sheet['tab'], $values);
                     Log::info(sprintf("Added deal %d to Sheets.", $deal['id']));
                 }
             } catch (MapperException $e) {
                 // Use json for logging as it's one line.
-                Log::error(sprintf('Error "%s" while mapping %s', $e->getMessage(), json_encode($map)));
+                Log::error(sprintf('Error "%s" while mapping %s', $e->getMessage(), json_encode($sheet)));
             }
         }
     }
 
-    public function map($deal, $map)
+    public function map($deal, $mapping)
     {
-        $colMapping = array_flip($map);
         $values = [];
-        for ($i = 0; $i < max(array_keys($colMapping)); $i++) {
+        for ($i = 0; $i <= max(array_keys($mapping)); $i++) {
             $value = '';
-            if (isset($colMapping[$i+1])) {
-                $field = $colMapping[$i+1];
+            if (isset($mapping[$i])) {
+                $field = $mapping[$i];
                 if (isset($deal[$field])) {
                     $value = $deal[$field];
                 } else {
@@ -100,19 +104,11 @@ class UpdateSheets
 
     protected function validateMapping($map)
     {
-        if (array_keys($map) != ['sheet', 'tab', 'map']) {
-            throw new MapperException('Each mapping should contain "sheet", "tab" and "map", and nothing else.');
+        if (array_keys($map) != ['sheet', 'tab']) {
+            throw new MapperException('Each sheet spec should contain "sheet" and "tab", and nothing else.');
         }
         if (!is_string($map['sheet']) || !is_string($map['tab'])) {
-            throw new MapperException('Sheet and tab of each mapping should be a string.');
-        }
-        foreach ($map['map'] as $key => $val) {
-            if (!is_string($key) || !is_int($val)) {
-                throw new MapperException('Map should consist of string => int pairs.');
-            }
-        }
-        if (!isset($map['map']['id'])) {
-            throw new MapperException('The "id" field must be mapped.');
+            throw new MapperException('Sheet and tab of each sheet spec should be a string.');
         }
     }
 
