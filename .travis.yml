@@ -13,13 +13,22 @@ env:
     
 install: composer install --prefer-source
 
-script:
+# Some test setup.
+before_script:
   - mkdir coverage
   - touch /tmp/acdc.sqlite
   - ./artisan migrate
+
+script:
+  # Spec tests.
   - ./vendor/bin/phpspec run
   - ./vendor/bin/phpcov merge --clover=clover.xml coverage/
   - bash <(curl -s https://codecov.io/bash) -c -F spec
-  - ./vendor/bin/phpunit --coverage-php=coverage/unit.cov
+  # Unit tests
+  - ./vendor/bin/phpunit --testsuite Unit --coverage-php=coverage/unit.cov
   - ./vendor/bin/phpcov merge --clover=clover.xml coverage/
   - bash <(curl -s https://codecov.io/bash) -c -F unit
+  # Feature tests
+  - ./vendor/bin/phpunit --testsuite Feature --coverage-php=coverage/feature.cov
+  - ./vendor/bin/phpcov merge --clover=clover.xml coverage/
+  - bash <(curl -s https://codecov.io/bash) -c -F feature
