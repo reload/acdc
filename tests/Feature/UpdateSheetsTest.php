@@ -90,6 +90,7 @@ class UpdateSheetsTest extends TestCase
         $updater->handle(new DealUpdated(42));
     }
 
+    // This should probably be a unit test instead.
     public function testMapFunction()
     {
         // Suppress log output.
@@ -136,12 +137,39 @@ class UpdateSheetsTest extends TestCase
         $this->assertEquals(['', 12, '', ''], $updater->map($deal, $map));
     }
 
+    // This too.
+    public function testDateTranslation()
+    {
+        // Suppress log output.
+        Log::spy();
+
+        $ac = $this->prophesize(ActiveCampaign::class);
+        $sheets = $this->prophesize(Sheets::class);
+
+        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+
+        $deal = [
+            'untranslated' => '2019-02-13T03:12:08-06:00',
+            'cdate' => '2019-02-13T03:12:08-06:00',
+            'mdate' => '2019-02-13T03:12:08-06:00',
+        ];
+
+        $expected = [
+            'untranslated' => '2019-02-13T03:12:08-06:00',
+            'cdate' => '2019-02-13 09:12:08',
+            'mdate' => '2019-02-13 09:12:08',
+        ];
+
+        $this->assertEquals($expected, $updater->translateFields($deal));
+    }
+
     public function testAppending()
     {
         Log::spy();
         Log::shouldNotReceive('error');
         $deal = [
             'id' => '500',
+            'cdate' => '2019-02-13T03:12:08-06:00',
         ];
 
         $mapping = [
@@ -150,6 +178,7 @@ class UpdateSheetsTest extends TestCase
                 'tab' => 'the-tab',
                 'map' => [
                     'id' => 1,
+                    'cdate' => 2
                 ]
             ],
         ];
@@ -162,7 +191,7 @@ class UpdateSheetsTest extends TestCase
         $sheets = $this->prophesize(Sheets::class);
         $sheets->data('the-sheet', 'the-tab')->willReturn([[]]);
 
-        $sheets->appendRow('the-sheet', 'the-tab', [500])->shouldBeCalled();
+        $sheets->appendRow('the-sheet', 'the-tab', [500, '2019-02-13 09:12:08'])->shouldBeCalled();
 
         $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
         $updater->handle(new DealUpdated(42));

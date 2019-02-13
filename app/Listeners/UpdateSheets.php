@@ -51,7 +51,7 @@ class UpdateSheets
                 $this->validateMapping($map);
 
                 // Create new row.
-                $values = $this->map($deal, $map['map']);
+                $values = $this->map($this->translateFields($deal), $map['map']);
 
                 // See if the row exists.
                 $idCol = $map['map']['id'] - 1;
@@ -114,5 +114,17 @@ class UpdateSheets
         if (!isset($map['map']['id'])) {
             throw new MapperException('The "id" field must be mapped.');
         }
+    }
+
+    public function translateFields($deal)
+    {
+        foreach (['cdate', 'mdate'] as $field) {
+            if (isset($deal[$field])) {
+                $time = strtotime($deal[$field]);
+                $deal[$field] = date('Y-m-d H:i:s', $time);
+            }
+        }
+
+        return $deal;
     }
 }
