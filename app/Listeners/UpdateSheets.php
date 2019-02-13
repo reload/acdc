@@ -121,6 +121,10 @@ class UpdateSheets
             }
         }
 
+        if (isset($deal['value'])) {
+            $deal['value'] = round($deal['value'] / 100);
+        }
+
         return $deal;
     }
 }

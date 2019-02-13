@@ -82,4 +82,56 @@ class UpdateSheetsTest extends TestCase
 
         $this->assertEquals($expected, $updater->translateFields($deal));
     }
+
+    public function testValueTranslation()
+    {
+        // Suppress log output.
+        Log::spy();
+
+        $ac = $this->prophesize(ActiveCampaign::class);
+        $sheets = $this->prophesize(Sheets::class);
+
+        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+
+        $deal = [
+            'untranslated' => '100000',
+            'value' => '100000',
+        ];
+        $expected = [
+            'untranslated' => '100000',
+            'value' => '1000',
+        ];
+        $this->assertEquals($expected, $updater->translateFields($deal));
+
+        $deal = [
+            'untranslated' => '34000',
+            'value' => '34000',
+        ];
+        $expected = [
+            'untranslated' => '34000',
+            'value' => '340',
+        ];
+        $this->assertEquals($expected, $updater->translateFields($deal));
+
+        $deal = [
+            'untranslated' => '123',
+            'value' => '123',
+        ];
+        $expected = [
+            'untranslated' => '123',
+            'value' => '1',
+        ];
+        $this->assertEquals($expected, $updater->translateFields($deal));
+
+        // Expect round up.
+        $deal = [
+            'untranslated' => '777',
+            'value' => '777',
+        ];
+        $expected = [
+            'untranslated' => '777',
+            'value' => '8',
+        ];
+        $this->assertEquals($expected, $updater->translateFields($deal));
+    }
 }
