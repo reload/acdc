@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\ActiveCampaign;
 use App\Events\DealUpdated;
-use App\Exceptions\MapperException;
+use App\Exceptions\UpdateSheetsException;
 use App\Listeners\UpdateSheets;
 use App\Sheets;
 use Illuminate\Support\Facades\Log;
@@ -16,7 +16,7 @@ class UpdateSheetsTest extends TestCase
 {
     public function testMissingMapping()
     {
-        $this->expectException(MapperException::class);
+        $this->expectException(UpdateSheetsException::class);
 
         putenv('SHEETS=');
 

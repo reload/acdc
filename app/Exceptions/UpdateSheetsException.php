@@ -4,6 +4,6 @@ namespace App\Exceptions;
 
 use RuntimeException;
 
-class MapperException extends RuntimeException
+class UpdateSheetsException extends RuntimeException
 {
 }

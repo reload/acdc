@@ -4,7 +4,7 @@ namespace App\Listeners;
 
 use App\ActiveCampaign;
 use App\Events\DealUpdated;
-use App\Exceptions\MapperException;
+use App\Exceptions\UpdateSheetsException;
 use App\Sheets;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -44,7 +44,7 @@ class UpdateSheets
         }
         $sheets = YAML::parse(strtr(env('SHEETS', ''), ['\n' => "\n"]));
         if (!is_array($sheets)) {
-            throw new MapperException('SHEETS should be an array of sheet specs.');
+            throw new UpdateSheetsException('SHEETS should be an array of sheet specs.');
         }
         foreach ($sheets as $sheet) {
             try {
@@ -52,7 +52,7 @@ class UpdateSheets
 
                 $fieldMapping = $this->sheets->header($sheet['sheet'], $sheet['tab']);
                 if (!in_array('id', $fieldMapping)) {
-                    throw new MapperException('The "id" field must be mapped.');
+                    throw new UpdateSheetsException('The "id" field must be mapped.');
                 }
 
                 // Create new row.
@@ -62,7 +62,7 @@ class UpdateSheets
                 $idCol = array_search('id', $fieldMapping);
                 $sheetData = $this->sheets->data($sheet['sheet'], $sheet['tab']);
                 if (!$sheetData) {
-                    throw new MapperException('Error fetching data from Sheets.');
+                    throw new UpdateSheetsException('Error fetching data from Sheets.');
                 }
                 $ids = array_map(function ($row) use ($idCol) {
                     return isset($row[$idCol]) ? $row[$idCol] : null;
@@ -77,7 +77,7 @@ class UpdateSheets
                     $this->sheets->appendRow($sheet['sheet'], $sheet['tab'], $values);
                     Log::info(sprintf("Added deal %d to Sheets.", $deal['id']));
                 }
-            } catch (MapperException $e) {
+            } catch (UpdateSheetsException $e) {
                 // Use json for logging as it's one line.
                 Log::error(sprintf('Error "%s" while mapping %s', $e->getMessage(), json_encode($sheet)));
             }
@@ -105,10 +105,10 @@ class UpdateSheets
     protected function validateMapping($map)
     {
         if (array_keys($map) != ['sheet', 'tab']) {
-            throw new MapperException('Each sheet spec should contain "sheet" and "tab", and nothing else.');
+            throw new UpdateSheetsException('Each sheet spec should contain "sheet" and "tab", and nothing else.');
         }
         if (!is_string($map['sheet']) || !is_string($map['tab'])) {
-            throw new MapperException('Sheet and tab of each sheet spec should be a string.');
+            throw new UpdateSheetsException('Sheet and tab of each sheet spec should be a string.');
         }
     }
 

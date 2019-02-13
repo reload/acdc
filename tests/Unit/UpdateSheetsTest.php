@@ -4,7 +4,6 @@ namespace Tests\Unit;
 
 use App\ActiveCampaign;
 use App\Events\DealUpdated;
-use App\Exceptions\MapperException;
 use App\Listeners\UpdateSheets;
 use App\Sheets;
 use Illuminate\Foundation\Testing\RefreshDatabase;
