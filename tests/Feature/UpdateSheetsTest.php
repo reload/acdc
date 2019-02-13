@@ -58,7 +58,7 @@ class UpdateSheetsTest extends TestCase
 
     public function testMissingField()
     {
-        Log::shouldReceive("error")->with('Unknown field "banana".')->once();
+        Log::shouldReceive("warning")->with('Unknown field "banana".')->once();
         Log::shouldReceive("info");
 
         $deal = [
