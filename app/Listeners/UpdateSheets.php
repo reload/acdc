@@ -90,7 +90,7 @@ class UpdateSheets
                 if (isset($deal[$field])) {
                     $value = $deal[$field];
                 } else {
-                    Log::error(sprintf('Unknown field "%s".', $field));
+                    Log::warning(sprintf('Unknown field "%s".', $field));
                 }
             }
             $values[$i] = $value;
