@@ -110,7 +110,7 @@ class UpdateSheetsTest extends TestCase
         $sheets->header('the-sheet', 'the-tab')->willReturn(['id', 'cdate']);
         $sheets->data('the-sheet', 'the-tab')->willReturn([[]]);
 
-        $sheets->appendRow('the-sheet', 'the-tab', [500, '2019-02-13 09:12:08'])->shouldBeCalled();
+        $sheets->appendRow('the-sheet', 'the-tab', [500, '2019-02-13 09.12.08'])->shouldBeCalled();
 
         $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
         $updater->handle(new DealUpdated(42));

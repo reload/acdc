@@ -117,7 +117,7 @@ class UpdateSheets
         foreach (['cdate', 'mdate'] as $field) {
             if (isset($deal[$field])) {
                 $time = strtotime($deal[$field]);
-                $deal[$field] = date('Y-m-d H:i:s', $time);
+                $deal[$field] = date('Y-m-d H.i.s', $time);
             }
         }
 

@@ -76,8 +76,8 @@ class UpdateSheetsTest extends TestCase
 
         $expected = [
             'untranslated' => '2019-02-13T03:12:08-06:00',
-            'cdate' => '2019-02-13 09:12:08',
-            'mdate' => '2019-02-13 09:12:08',
+            'cdate' => '2019-02-13 09.12.08',
+            'mdate' => '2019-02-13 09.12.08',
         ];
 
         $this->assertEquals($expected, $updater->translateFields($deal));
