@@ -33,7 +33,7 @@ class UpdateSheetsTest extends TestCase
             'id' => '500',
         ];
 
-        $mapping = [
+        $sheets = [
             [
                 'sheet' => 'the-sheet',
                 'tab' => 'the-tab',
@@ -42,7 +42,7 @@ class UpdateSheetsTest extends TestCase
 
         Log::shouldReceive("error")->with('Error "The "id" field must be mapped." while mapping {"sheet":"the-sheet","tab":"the-tab"}')->once();
 
-        putenv('SHEETS=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
@@ -63,14 +63,14 @@ class UpdateSheetsTest extends TestCase
             'id' => '500',
         ];
 
-        $mapping = [
+        $sheets = [
             [
                 'sheet' => 'the-sheet',
                 'tab' => 'the-tab',
             ],
         ];
 
-        putenv('SHEETS=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
@@ -94,14 +94,14 @@ class UpdateSheetsTest extends TestCase
             'cdate' => '2019-02-13T03:12:08-06:00',
         ];
 
-        $mapping = [
+        $sheets = [
             [
                 'sheet' => 'the-sheet',
                 'tab' => 'the-tab',
             ],
         ];
 
-        putenv('SHEETS=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
@@ -131,14 +131,14 @@ class UpdateSheetsTest extends TestCase
             ['two', 500],
             ['three', 501],
         ];
-        $mapping = [
+        $sheets = [
             [
                 'sheet' => 'the-sheet',
                 'tab' => 'the-tab',
             ],
         ];
 
-        putenv('SHEETS=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
@@ -155,7 +155,7 @@ class UpdateSheetsTest extends TestCase
 
     public function testCatchingErrorsInAC()
     {
-        $mapping = [
+        $sheets = [
             [
                 'sheet' => 'the-sheet',
                 'tab' => 'the-tab',
@@ -167,7 +167,7 @@ class UpdateSheetsTest extends TestCase
 
         Log::shouldReceive("error")->with('Error fetching deal 42: bad stuff')->once();
 
-        putenv('SHEETS=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willThrow(new RuntimeException('bad stuff'));
@@ -190,7 +190,7 @@ class UpdateSheetsTest extends TestCase
             'cdate' => '2019-02-13T03:12:08-06:00',
         ];
 
-        $mapping = [
+        $sheets = [
             [
                 'sheet' => 'the-sheet',
                 'tab' => 'the-tab',
@@ -198,7 +198,7 @@ class UpdateSheetsTest extends TestCase
             ],
         ];
 
-        putenv('SHEETS=' . YAML::dump($mapping));
+        putenv('SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
