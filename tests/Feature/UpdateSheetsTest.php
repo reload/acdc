@@ -110,7 +110,7 @@ class UpdateSheetsTest extends TestCase
         $sheets->header('the-sheet', 'the-tab')->willReturn(['id', 'cdate']);
         $sheets->data('the-sheet', 'the-tab')->willReturn([[]]);
 
-        $sheets->appendRow('the-sheet', 'the-tab', [500, '2019-02-13 09.12.08'])->shouldBeCalled();
+        $sheets->appendRow('the-sheet', 'the-tab', [500, '2019-02-13 09:12:08'])->shouldBeCalled();
 
         $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
         $updater->handle(new DealUpdated(42));
@@ -123,6 +123,7 @@ class UpdateSheetsTest extends TestCase
         $deal = [
             'id' => '500',
             'name' => 'new name',
+            'some-value' => '93.14'
         ];
 
         $sheet = [
@@ -143,10 +144,10 @@ class UpdateSheetsTest extends TestCase
         $ac->get(42)->willReturn($deal);
 
         $sheets = $this->prophesize(Sheets::class);
-        $sheets->header('the-sheet', 'the-tab')->willReturn(['name', 'id']);
+        $sheets->header('the-sheet', 'the-tab')->willReturn(['name', 'id', 'some-value']);
         $sheets->data('the-sheet', 'the-tab')->willReturn($sheet);
 
-        $sheets->updateRow('the-sheet', 'the-tab', 2, ['new name', 500])->shouldBeCalled();
+        $sheets->updateRow('the-sheet', 'the-tab', 2, ['new name', 500, '93.14'])->shouldBeCalled();
 
         $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
         $updater->handle(new DealUpdated(42));
@@ -172,6 +173,42 @@ class UpdateSheetsTest extends TestCase
         $ac->get(42)->willThrow(new RuntimeException('bad stuff'));
 
         $sheets = $this->prophesize(Sheets::class);
+
+        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+        $updater->handle(new DealUpdated(42));
+    }
+
+    public function testUpdatingDanish()
+    {
+        Log::spy();
+        Log::shouldNotReceive('error');
+
+        $deal = [
+            'id' => '42',
+            'name' => 'new name',
+            'some-value' => '8.241',
+            'cdate' => '2019-02-13T03:12:08-06:00',
+        ];
+
+        $mapping = [
+            [
+                'sheet' => 'the-sheet',
+                'tab' => 'the-tab',
+                'localeTranslate' => true,
+            ],
+        ];
+
+        putenv('SHEETS=' . YAML::dump($mapping));
+
+        $ac = $this->prophesize(ActiveCampaign::class);
+        $ac->get(42)->willReturn($deal);
+
+        $sheets = $this->prophesize(Sheets::class);
+        $sheets->header('the-sheet', 'the-tab')->willReturn(['name', 'id', 'some-value', 'cdate']);
+        $sheets->data('the-sheet', 'the-tab')->willReturn([[]]);
+
+        $expected = ['new name', 42, '8,241', '2019-02-13 09.12.08'];
+        $sheets->appendRow('the-sheet', 'the-tab', $expected)->shouldBeCalled();
 
         $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
         $updater->handle(new DealUpdated(42));

@@ -55,8 +55,9 @@ class UpdateSheets
                     throw new UpdateSheetsException('The "id" field must be mapped.');
                 }
 
+                $localeTranslation = isset($sheet['localeTranslate']);
                 // Create new row.
-                $values = $this->map($this->translateFields($deal), $fieldMapping);
+                $values = $this->map($this->translateFields($deal, $localeTranslation), $fieldMapping);
 
                 // See if the row exists.
                 $idCol = array_search('id', $fieldMapping);
@@ -104,25 +105,38 @@ class UpdateSheets
 
     protected function validateMapping($map)
     {
-        if (array_keys($map) != ['sheet', 'tab']) {
-            throw new UpdateSheetsException('Each sheet spec should contain "sheet" and "tab", and nothing else.');
+        if (array_keys($map) != ['sheet', 'tab'] && array_keys($map) != ['sheet', 'tab', 'localeTranslate']) {
+            throw new UpdateSheetsException('Each sheet spec should contain "sheet" and "tab", and optionally localeTranslate.');
         }
         if (!is_string($map['sheet']) || !is_string($map['tab'])) {
             throw new UpdateSheetsException('Sheet and tab of each sheet spec should be a string.');
         }
     }
 
-    public function translateFields($deal)
+    public function translateFields($deal, $localeTranslation = false)
     {
         foreach (['cdate', 'mdate'] as $field) {
             if (isset($deal[$field])) {
                 $time = strtotime($deal[$field]);
-                $deal[$field] = date('Y-m-d H.i.s', $time);
+                if ($localeTranslation) {
+                    $deal[$field] = date('Y-m-d H.i.s', $time);
+                } else {
+                    $deal[$field] = date('Y-m-d H:i:s', $time);
+                }
             }
         }
 
         if (isset($deal['value'])) {
             $deal['value'] = round($deal['value'] / 100);
+        }
+
+        // Replace decimal separator.
+        if ($localeTranslation) {
+            foreach ($deal as $key => $value) {
+                if (is_string($value) && preg_match('/^\d+\.\d+$/', $value)) {
+                    $deal[$key] = strtr($value, ['.' => ',']);
+                }
+            }
         }
 
         return $deal;

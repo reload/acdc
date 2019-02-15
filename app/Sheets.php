@@ -133,6 +133,10 @@ class Sheets
      */
     public function appendRow(string $spreadsheetId, string $sheetId, array $row)
     {
+        // We'd much rather use RAW, but then dates aren't parsed. So until
+        // someone rewrites this to be able to switch between RAW and
+        // USER_ENTERED depending on content, we'll use USER_ENTERED and
+        // translate the decimal separator for numbers.
         $options = ['valueInputOption' => 'USER_ENTERED'];
         $values = new Google_Service_Sheets_ValueRange(['values' => [$row]]);
         $result = $this->sheets->spreadsheets_values->append(

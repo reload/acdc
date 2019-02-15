@@ -76,8 +76,8 @@ class UpdateSheetsTest extends TestCase
 
         $expected = [
             'untranslated' => '2019-02-13T03:12:08-06:00',
-            'cdate' => '2019-02-13 09.12.08',
-            'mdate' => '2019-02-13 09.12.08',
+            'cdate' => '2019-02-13 09:12:08',
+            'mdate' => '2019-02-13 09:12:08',
         ];
 
         $this->assertEquals($expected, $updater->translateFields($deal));
@@ -133,5 +133,35 @@ class UpdateSheetsTest extends TestCase
             'value' => '8',
         ];
         $this->assertEquals($expected, $updater->translateFields($deal));
+    }
+
+    public function testLanguageTranslation()
+    {
+        // Suppress log output.
+        Log::spy();
+
+        $ac = $this->prophesize(ActiveCampaign::class);
+        $sheets = $this->prophesize(Sheets::class);
+
+        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+
+        $deal = [
+            'cdate' => '2019-02-13T03:12:08-06:00',
+            'some-value' => '3.14',
+            'some-array' => ['3.14'],
+        ];
+        $expected = [
+            'cdate' => '2019-02-13 09:12:08',
+            'some-value' => '3.14',
+            'some-array' => ['3.14'],
+        ];
+        $this->assertEquals($expected, $updater->translateFields($deal));
+
+        $expected = [
+            'cdate' => '2019-02-13 09.12.08',
+            'some-value' => '3,14',
+            'some-array' => ['3.14'],
+        ];
+        $this->assertEquals($expected, $updater->translateFields($deal, true));
     }
 }
