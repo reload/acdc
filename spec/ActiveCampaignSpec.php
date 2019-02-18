@@ -28,7 +28,11 @@ class ActiveCampaignSpec extends ObjectBehavior
         $headers = [
             'Api-Token' => '456',
         ];
-        $client->request('GET', 'https://123.api-us1.com/api/3/users/me', ['headers' => $headers])->willReturn(new Response());
+        $client->request(
+            'GET',
+            'https://123.api-us1.com/api/3/users/me',
+            ['headers' => $headers]
+        )->willReturn(new Response());
 
         $this->ping()->shouldReturn(true);
     }
@@ -39,7 +43,11 @@ class ActiveCampaignSpec extends ObjectBehavior
         $headers = [
             'Api-Token' => '456',
         ];
-        $client->request('GET', 'https://123.api-us1.com/api/3/users/me', ['headers' => $headers])->willThrow(new Exception());
+        $client->request(
+            'GET',
+            'https://123.api-us1.com/api/3/users/me',
+            ['headers' => $headers]
+        )->willThrow(new Exception());
 
         $this->shouldThrow(new Exception())->during('ping');
     }
@@ -68,12 +76,20 @@ class ActiveCampaignSpec extends ObjectBehavior
             ],
         ];
         $response = new Response(200, [], json_encode($apiResponse));
-        $client->request('GET', 'https://123.api-us1.com/api/3/deals/789', ['headers' => $headers])->willReturn($response);
+        $client->request(
+            'GET',
+            'https://123.api-us1.com/api/3/deals/789',
+            ['headers' => $headers]
+        )->willReturn($response);
 
         // https://1499693424850.api-us1.com/api/3/deals/789/dealCustomFieldData
         $apiResponse = ['dealCustomFieldData' => []];
         $response = new Response(200, [], json_encode($apiResponse));
-        $client->request('GET', 'https://123.api-us1.com/api/3/deals/789/dealCustomFieldData', ['headers' => $headers])->willReturn($response);
+        $client->request(
+            'GET',
+            'https://123.api-us1.com/api/3/deals/789/dealCustomFieldData',
+            ['headers' => $headers]
+        )->willReturn($response);
 
         $this->get(789)->shouldReturn(['id' => 789]);
     }
@@ -88,7 +104,11 @@ class ActiveCampaignSpec extends ObjectBehavior
         $apiResponse = [];
 
         $response = new Response(200, [], json_encode($apiResponse));
-        $client->request('GET', 'https://123.api-us1.com/api/3/deals/789', ['headers' => $headers])->willReturn($response);
+        $client->request(
+            'GET',
+            'https://123.api-us1.com/api/3/deals/789',
+            ['headers' => $headers]
+        )->willReturn($response);
         $this->shouldThrow(RuntimeException::class)->during('get', [789]);
     }
 
@@ -105,7 +125,11 @@ class ActiveCampaignSpec extends ObjectBehavior
             ],
         ];
         $response = new Response(200, [], json_encode($apiResponse));
-        $client->request('GET', 'https://123.api-us1.com/api/3/deals/789', ['headers' => $headers])->willReturn($response);
+        $client->request(
+            'GET',
+            'https://123.api-us1.com/api/3/deals/789',
+            ['headers' => $headers]
+        )->willReturn($response);
 
         // https://1499693424850.api-us1.com/api/3/deals/789/dealCustomFieldData
         $apiResponse = [
@@ -125,7 +149,11 @@ class ActiveCampaignSpec extends ObjectBehavior
             ]
         ];
         $response = new Response(200, [], json_encode($apiResponse));
-        $client->request('GET', 'https://123.api-us1.com/api/3/deals/789/dealCustomFieldData', ['headers' => $headers])->willReturn($response);
+        $client->request(
+            'GET',
+            'https://123.api-us1.com/api/3/deals/789/dealCustomFieldData',
+            ['headers' => $headers]
+        )->willReturn($response);
 
         $expected = [
             'id' => 789,
