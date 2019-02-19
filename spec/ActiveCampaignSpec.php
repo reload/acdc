@@ -215,7 +215,7 @@ class ActiveCampaignSpec extends ObjectBehavior
 
         $client->request(
             'PUT',
-            'https://123.api-us1.com/api/3/deals/42/dealCustomFieldData/12',
+            'https://123.api-us1.com/api/3/dealCustomFieldData/12',
             ['json' => $data, 'headers' => $headers]
         )->willReturn($this->response())->shouldBeCalled();
 
@@ -247,7 +247,7 @@ class ActiveCampaignSpec extends ObjectBehavior
 
         $client->request(
             'POST',
-            'https://123.api-us1.com/api/3/deals/42/dealCustomFieldData',
+            'https://123.api-us1.com/api/3/dealCustomFieldData',
             ['json' => $data, 'headers' => $headers]
         )->willReturn($this->response())->shouldBeCalled();
 

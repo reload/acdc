@@ -107,7 +107,7 @@ class ActiveCampaign
             ];
             $this->call(
                 'PUT',
-                'deals/' . $dealId . '/dealCustomFieldData/' . $fieldInstanceId,
+                'dealCustomFieldData/' . $fieldInstanceId,
                 ['json' => $data]
             );
         } else {
@@ -120,7 +120,7 @@ class ActiveCampaign
             ];
             $this->call(
                 'POST',
-                'deals/' . $dealId . '/dealCustomFieldData',
+                'dealCustomFieldData',
                 ['json' => $data]
             );
         }
