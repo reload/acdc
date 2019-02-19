@@ -253,4 +253,46 @@ class ActiveCampaignSpec extends ObjectBehavior
 
         $this->updateCustomField(42, 'custom_field_2', 3);
     }
+
+    function it_should_handle_empty_custom_fields(Client $client)
+    {
+        $this->beConstructedWith($client, '123', '456');
+        $headers = [
+            'Api-Token' => '456',
+        ];
+        // https://1499693424850.api-us1.com/api/3/deals/789
+        $response = $this->response([
+            'deal' => [
+                'id' => 789,
+            ],
+        ]);
+
+        $client->request(
+            'GET',
+            'https://123.api-us1.com/api/3/deals/789',
+            ['headers' => $headers]
+        )->willReturn($response);
+
+        // https://1499693424850.api-us1.com/api/3/deals/789/dealCustomFieldData
+        $response = $this->response([
+            'dealCustomFieldData' => [
+                [
+                    'customFieldId' => 1,
+                    'fieldValue' => null,
+                ],
+            ]
+        ]);
+
+        $client->request(
+            'GET',
+            'https://123.api-us1.com/api/3/deals/789/dealCustomFieldData',
+            ['headers' => $headers]
+        )->willReturn($response);
+
+        $expected = [
+            'id' => 789,
+            'custom_field_1' => null,
+        ];
+        $this->get(789)->shouldReturn($expected);
+    }
 }

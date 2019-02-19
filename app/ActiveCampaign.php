@@ -68,7 +68,9 @@ class ActiveCampaign
         // Fetch custom fields.
         $data = $this->getCustomFields($dealId);
         foreach ($data as $customField) {
-            if (!isset($customField['customFieldId']) || !isset($customField['fieldValue'])) {
+            if (!isset($customField['customFieldId']) ||
+                !array_key_exists('fieldValue', $customField)) {
+                print_r($customField);
                 throw new RuntimeException('Malformed custom field response on deal ' . $dealId);
             }
             $deal['custom_field_' . $customField['customFieldId']] = $customField['fieldValue'];
