@@ -23,15 +23,25 @@ class ActiveCampaign
         return 'https://' . $this->account . '.api-us1.com/api/3/' . $path;
     }
 
-    protected function call(string $method, string $path = '')
+    protected function call(string $method, string $path = '', $options = [])
     {
         if (empty($this->account) || empty($this->token)) {
             throw new RuntimeException('Empty account/token');
         }
-        $response = $this->client->request($method, $this->getUrl($path), ['headers' => [
+        $response = $this->client->request($method, $this->getUrl($path), $options + ['headers' => [
             'Api-Token' => $this->token,
         ]]);
         return json_decode($response->getBody(), true);
+    }
+
+    protected function getCustomFields($dealId)
+    {
+        $data = $this->call('GET', 'deals/' . $dealId . '/dealCustomFieldData');
+        if (!isset($data['dealCustomFieldData'])) {
+            throw new RuntimeException('Could not get deal custom fields on ' . $dealId);
+        }
+
+        return $data['dealCustomFieldData'];
     }
 
     public function ping()
@@ -56,11 +66,8 @@ class ActiveCampaign
         $deal = $data['deal'];
 
         // Fetch custom fields.
-        $data = $this->call('GET', 'deals/' . $dealId . '/dealCustomFieldData');
-        if (!isset($data['dealCustomFieldData'])) {
-            throw new RuntimeException('Could not get deal custom fields on ' . $dealId);
-        }
-        foreach ($data['dealCustomFieldData'] as $customField) {
+        $data = $this->getCustomFields($dealId);
+        foreach ($data as $customField) {
             if (!isset($customField['customFieldId']) || !isset($customField['fieldValue'])) {
                 throw new RuntimeException('Malformed custom field response on deal ' . $dealId);
             }
@@ -68,5 +75,52 @@ class ActiveCampaign
         }
 
         return $deal;
+    }
+
+    public function updateCustomField($dealId, $fieldName, $value)
+    {
+        if (!preg_match('/^custom_field_(\d+)$/', $fieldName, $matches)) {
+            throw new RuntimeException('Bad custom field id: ' . $id);
+        }
+        $fieldId = $matches[1];
+
+        // Find field id for the field instance on the deal.
+        $fieldInstanceId = null;
+        $data = $this->getCustomFields($dealId);
+        foreach ($data as $customField) {
+            if (!isset($customField['customFieldId'])|| !isset($customField['id'])) {
+                throw new RuntimeException('Malformed custom field response on deal ' . $dealId);
+            }
+            if ($customField['customFieldId'] == $fieldId) {
+                $fieldInstanceId = $customField['id'];
+                break;
+            }
+        }
+
+        if ($fieldInstanceId) {
+            $data = [
+                'dealCustomFieldDatum' => [
+                    'fieldValue' => $value,
+                ],
+            ];
+            $this->call(
+                'PUT',
+                'deals/' . $dealId . '/dealCustomFieldData/' . $fieldInstanceId,
+                ['json' => $data]
+            );
+        } else {
+            $data = [
+                'dealCustomFieldDatum' => [
+                    'dealId' => $dealId,
+                    'fieldValue' => $value,
+                    'customFieldId' => $fieldId,
+                ],
+            ];
+            $this->call(
+                'POST',
+                'deals/' . $dealId . '/dealCustomFieldData',
+                ['json' => $data]
+            );
+        }
     }
 }
