@@ -34,14 +34,14 @@ class ActiveCampaign
         return json_decode($response->getBody(), true);
     }
 
-    protected function getCustomFields($dealId)
+    protected function getCustomFields($dealId) : array
     {
         $data = $this->call('GET', 'deals/' . $dealId . '/dealCustomFieldData');
         if (!isset($data['dealCustomFieldData'])) {
             throw new RuntimeException('Could not get deal custom fields on ' . $dealId);
         }
 
-        return $data['dealCustomFieldData'];
+        return is_array($data['dealCustomFieldData']) ? $data['dealCustomFieldData'] : [];
     }
 
     public function ping()
