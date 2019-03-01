@@ -38,11 +38,17 @@ class UpdateAverage
         }
 
         $sum = 0;
+        $count = 0;
         foreach (range(1, 5) as $num) {
-            $sum += $deal['custom_field_' . $num];
+            if (isset($deal['custom_field_' . $num])) {
+                $sum += $deal['custom_field_' . $num];
+                $count++;
+            }
         }
 
-        $this->activeCampaign->updateCustomField($deal['id'], 'custom_field_8', $sum / 5);
+        $average = $count > 0 ? $sum / $count : $sum;
+
+        $this->activeCampaign->updateCustomField($deal['id'], 'custom_field_8', $average);
         Log::info(sprintf("Updated deal %d with average.", $deal['id']));
     }
 }

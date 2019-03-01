@@ -44,4 +44,18 @@ class UpdateAverageTest extends TestCase
         $updater = new UpdateAverage($ac->reveal());
         $updater->handle(new DealUpdated(42));
     }
+
+    public function testNoData()
+    {
+        $deal = [
+            'id' => '42',
+        ];
+
+        $ac = $this->prophesize(ActiveCampaign::class);
+        $ac->get(42)->willReturn($deal);
+        $ac->updateCustomField(42, 'custom_field_8', 0)->shouldBeCalled();
+
+        $updater = new UpdateAverage($ac->reveal());
+        $updater->handle(new DealUpdated(42));
+    }
 }
