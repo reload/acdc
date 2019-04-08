@@ -39,6 +39,8 @@ class UpdateAverage
 
         $sum = 0;
         $count = 0;
+        // Sum the field values and use count to keep track how many were
+        // actually defined so we can calculate the average.
         foreach (range(1, 5) as $num) {
             if (isset($deal['custom_field_' . $num])) {
                 $sum += $deal['custom_field_' . $num];

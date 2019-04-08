@@ -85,6 +85,22 @@ class UpdateSheets
         }
     }
 
+    /**
+     * Map fields using given mapping.
+     *
+     * Creates a new array where the values are collected from the deal in the
+     * order defined by the mapping. For instance, given that deal is ['id' =>
+     * 12, 'name' => 'banana'], and a mapping of ['name', 'id'] it will return
+     * ['banana', 12].
+     *
+     * @param array $deal
+     *   The deal to map.
+     * @param array $mapping
+     *   The order of keys in $deal to return.
+     *
+     * @return array
+     *   The mapped data.
+     */
     public function map($deal, $mapping)
     {
         $values = [];
@@ -103,6 +119,9 @@ class UpdateSheets
         return $values;
     }
 
+    /**
+     * Validate mapping configuration.
+     */
     protected function validateMapping($map)
     {
         if (array_keys($map) != ['sheet', 'tab'] && array_keys($map) != ['sheet', 'tab', 'localeTranslate']) {
@@ -113,8 +132,25 @@ class UpdateSheets
         }
     }
 
+    /**
+     * "Translate" fields.
+     *
+     * Sheets has strong opinions on what it'll consider dates and decimal
+     * numbers depending on the locale of the sheet. Sadly there's no
+     * canonical representation, so we have to covert differently depending on
+     * whether it's an English sheet or danish one.
+     *
+     * @param array $deal
+     *   Deal to translate.
+     * @param bool $localeTranslation
+     *   Whether it's a danish sheet.
+     *
+     * @return array
+     *   The translated deal.
+     */
     public function translateFields($deal, $localeTranslation = false)
     {
+        // Render dates so sheets will see them as such.
         foreach (['cdate', 'mdate'] as $field) {
             if (isset($deal[$field])) {
                 $time = strtotime($deal[$field]);
@@ -126,6 +162,8 @@ class UpdateSheets
             }
         }
 
+        // AC uses lowest denominator for currencies, translate to everyday
+        // use.
         if (isset($deal['value'])) {
             $deal['value'] = round($deal['value'] / 100);
         }

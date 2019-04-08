@@ -99,6 +99,8 @@ class ActiveCampaign
         }
 
         if ($fieldInstanceId) {
+            // If we have a field instance id, we're updating an existing
+            // value.
             $data = [
                 'dealCustomFieldDatum' => [
                     'fieldValue' => $value,
@@ -110,6 +112,7 @@ class ActiveCampaign
                 ['json' => $data]
             );
         } else {
+            // Else POST the new value.
             $data = [
                 'dealCustomFieldDatum' => [
                     'dealId' => $dealId,
