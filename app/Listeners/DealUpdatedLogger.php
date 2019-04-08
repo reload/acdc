@@ -27,6 +27,6 @@ class DealUpdatedLogger
      */
     public function handle(DealUpdated $event)
     {
-        Log::info(sprintf('Deal %d update', $event->dealId));
+        Log::info(sprintf('Deal %d updated', $event->dealId));
     }
 }

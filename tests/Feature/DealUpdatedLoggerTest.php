@@ -13,7 +13,7 @@ class DealUpdatedLoggerTest extends TestCase
     {
         Log::shouldReceive('info')
             ->once()
-            ->with('Deal 42 update')
+            ->with('Deal 42 updated')
             ->andReturn();
 
         $logger = new DealUpdatedLogger();
