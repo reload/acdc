@@ -20,7 +20,7 @@ class GetDeal extends Command
      *
      * @var string
      */
-    protected $description = 'Get a deal from ActiveCampain and dump to stdout';
+    protected $description = 'Get a deal from ActiveCampaign and dump to stdout';
 
     /**
      * Create a new command instance.

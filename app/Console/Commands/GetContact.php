@@ -20,7 +20,7 @@ class GetContact extends Command
      *
      * @var string
      */
-    protected $description = 'Get a contact from ActiveCampain and dump to stdout';
+    protected $description = 'Get a contact from ActiveCampaign and dump to stdout';
 
     /**
      * Create a new command instance.
