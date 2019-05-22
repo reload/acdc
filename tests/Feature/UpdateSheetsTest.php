@@ -18,7 +18,7 @@ class UpdateSheetsTest extends TestCase
     {
         $this->expectException(UpdateSheetsException::class);
 
-        putenv('SHEETS=');
+        putenv('DEAL_SHEETS=');
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $sheets = $this->prophesize(Sheets::class);
@@ -42,7 +42,7 @@ class UpdateSheetsTest extends TestCase
 
         Log::shouldReceive("error")->with('Error "The "id" field must be mapped." while mapping {"sheet":"the-sheet","tab":"the-tab"}')->once();
 
-        putenv('SHEETS=' . YAML::dump($sheets));
+        putenv('DEAL_SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
@@ -70,7 +70,7 @@ class UpdateSheetsTest extends TestCase
             ],
         ];
 
-        putenv('SHEETS=' . YAML::dump($sheets));
+        putenv('DEAL_SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
@@ -101,7 +101,7 @@ class UpdateSheetsTest extends TestCase
             ],
         ];
 
-        putenv('SHEETS=' . YAML::dump($sheets));
+        putenv('DEAL_SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
@@ -138,7 +138,7 @@ class UpdateSheetsTest extends TestCase
             ],
         ];
 
-        putenv('SHEETS=' . YAML::dump($sheets));
+        putenv('DEAL_SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);
@@ -167,7 +167,7 @@ class UpdateSheetsTest extends TestCase
 
         Log::shouldReceive("error")->with('Error fetching deal 42: bad stuff')->once();
 
-        putenv('SHEETS=' . YAML::dump($sheets));
+        putenv('DEAL_SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willThrow(new RuntimeException('bad stuff'));
@@ -198,7 +198,7 @@ class UpdateSheetsTest extends TestCase
             ],
         ];
 
-        putenv('SHEETS=' . YAML::dump($sheets));
+        putenv('DEAL_SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->get(42)->willReturn($deal);

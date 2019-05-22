@@ -30,9 +30,9 @@ class UpdateSheets extends SheetWriter
             Log::error(sprintf('Error fetching deal %d: %s', $event->dealId, $e->getMessage()));
             return;
         }
-        $sheets = YAML::parse(strtr(env('SHEETS', ''), ['\n' => "\n"]));
+        $sheets = YAML::parse(strtr(env('DEAL_SHEETS', ''), ['\n' => "\n"]));
         if (!is_array($sheets)) {
-            throw new UpdateSheetsException('SHEETS should be an array of sheet specs.');
+            throw new UpdateSheetsException('DEAL_SHEETS should be an array of sheet specs.');
         }
         foreach ($sheets as $sheet) {
             try {
