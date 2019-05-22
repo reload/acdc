@@ -4,11 +4,11 @@ namespace Tests\Feature;
 
 use App\ActiveCampaign;
 use App\Events\DealUpdated;
-use App\Listeners\UpdateAverage;
+use App\Listeners\UpdateDealAverage;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
-class UpdateAverageTest extends TestCase
+class UpdateDealAverageTest extends TestCase
 {
     public function testAverageUpdate()
     {
@@ -29,7 +29,7 @@ class UpdateAverageTest extends TestCase
         $ac->getDeal(42)->willReturn($deal);
         $ac->updateDealCustomField(42, 'custom_field_8', 3)->shouldBeCalled();
 
-        $updater = new UpdateAverage($ac->reveal());
+        $updater = new UpdateDealAverage($ac->reveal());
         $updater->handle(new DealUpdated(42));
 
         $deal = [
@@ -45,7 +45,7 @@ class UpdateAverageTest extends TestCase
         $ac->getDeal(42)->willReturn($deal);
         $ac->updateDealCustomField(42, 'custom_field_8', 2.8)->shouldBeCalled();
 
-        $updater = new UpdateAverage($ac->reveal());
+        $updater = new UpdateDealAverage($ac->reveal());
         $updater->handle(new DealUpdated(42));
     }
 
@@ -63,7 +63,7 @@ class UpdateAverageTest extends TestCase
         $ac->getDeal(42)->willReturn($deal);
         $ac->updateDealCustomField(42, 'custom_field_8', 0)->shouldBeCalled();
 
-        $updater = new UpdateAverage($ac->reveal());
+        $updater = new UpdateDealAverage($ac->reveal());
         $updater->handle(new DealUpdated(42));
     }
 }

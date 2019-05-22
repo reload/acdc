@@ -5,14 +5,14 @@ namespace Tests\Feature;
 use App\ActiveCampaign;
 use App\Events\DealUpdated;
 use App\Exceptions\UpdateSheetsException;
-use App\Listeners\UpdateSheets;
+use App\Listeners\UpdateDealSheets;
 use App\Sheets;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Symfony\Component\Yaml\Yaml;
 use Tests\TestCase;
 
-class UpdateSheetsTest extends TestCase
+class UpdateDealSheetsTest extends TestCase
 {
     public function testMissingMapping()
     {
@@ -23,7 +23,7 @@ class UpdateSheetsTest extends TestCase
         $ac = $this->prophesize(ActiveCampaign::class);
         $sheets = $this->prophesize(Sheets::class);
 
-        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
         $updater->handle(new DealUpdated(42));
     }
 
@@ -50,7 +50,7 @@ class UpdateSheetsTest extends TestCase
         $sheets = $this->prophesize(Sheets::class);
         $sheets->header('the-sheet', 'the-tab')->willReturn(['banana']);
 
-        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
         $updater->handle(new DealUpdated(42));
     }
 
@@ -81,7 +81,7 @@ class UpdateSheetsTest extends TestCase
 
         $sheets->appendRow('the-sheet', 'the-tab', [500, ''])->shouldBeCalled();
 
-        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
         $updater->handle(new DealUpdated(42));
     }
 
@@ -112,7 +112,7 @@ class UpdateSheetsTest extends TestCase
 
         $sheets->appendRow('the-sheet', 'the-tab', [500, '2019-02-13 09:12:08'])->shouldBeCalled();
 
-        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
         $updater->handle(new DealUpdated(42));
     }
 
@@ -149,7 +149,7 @@ class UpdateSheetsTest extends TestCase
 
         $sheets->updateRow('the-sheet', 'the-tab', 2, ['new name', 500, '93.14'])->shouldBeCalled();
 
-        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
         $updater->handle(new DealUpdated(42));
     }
 
@@ -174,7 +174,7 @@ class UpdateSheetsTest extends TestCase
 
         $sheets = $this->prophesize(Sheets::class);
 
-        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
         $updater->handle(new DealUpdated(42));
     }
 
@@ -210,7 +210,7 @@ class UpdateSheetsTest extends TestCase
         $expected = ['new name', 42, '8,241', '2019-02-13 09.12.08'];
         $sheets->appendRow('the-sheet', 'the-tab', $expected)->shouldBeCalled();
 
-        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
         $updater->handle(new DealUpdated(42));
     }
 }

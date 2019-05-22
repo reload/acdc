@@ -4,13 +4,13 @@ namespace Tests\Unit;
 
 use App\ActiveCampaign;
 use App\Events\DealUpdated;
-use App\Listeners\UpdateSheets;
+use App\Listeners\UpdateDealSheets;
 use App\Sheets;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
-class UpdateSheetsTest extends TestCase
+class UpdateDealSheetsTest extends TestCase
 {
     public function testMapFunction()
     {
@@ -20,7 +20,7 @@ class UpdateSheetsTest extends TestCase
         $ac = $this->prophesize(ActiveCampaign::class);
         $sheets = $this->prophesize(Sheets::class);
 
-        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
 
         $deal = [
             'id' => 12,
@@ -66,7 +66,7 @@ class UpdateSheetsTest extends TestCase
         $ac = $this->prophesize(ActiveCampaign::class);
         $sheets = $this->prophesize(Sheets::class);
 
-        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
 
         $deal = [
             'untranslated' => '2019-02-13T03:12:08-06:00',
@@ -91,7 +91,7 @@ class UpdateSheetsTest extends TestCase
         $ac = $this->prophesize(ActiveCampaign::class);
         $sheets = $this->prophesize(Sheets::class);
 
-        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
 
         $deal = [
             'untranslated' => '100000',
@@ -143,7 +143,7 @@ class UpdateSheetsTest extends TestCase
         $ac = $this->prophesize(ActiveCampaign::class);
         $sheets = $this->prophesize(Sheets::class);
 
-        $updater = new UpdateSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
 
         $deal = [
             'cdate' => '2019-02-13T03:12:08-06:00',

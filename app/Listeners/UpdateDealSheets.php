@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Symfony\Component\Yaml\Yaml;
 use Throwable;
 
-class UpdateSheets extends SheetWriter
+class UpdateDealSheets extends SheetWriter
 {
 
     /**
