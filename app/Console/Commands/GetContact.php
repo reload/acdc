@@ -13,7 +13,7 @@ class GetContact extends Command
      *
      * @var string
      */
-    protected $signature = 'ac:getcontact {contact_id}';
+    protected $signature = 'ac:get:contact {contact_id}';
 
     /**
      * The console command description.

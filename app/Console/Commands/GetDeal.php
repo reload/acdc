@@ -13,7 +13,7 @@ class GetDeal extends Command
      *
      * @var string
      */
-    protected $signature = 'ac:getdeal {deal_id}';
+    protected $signature = 'ac:get:deal {deal_id}';
 
     /**
      * The console command description.
