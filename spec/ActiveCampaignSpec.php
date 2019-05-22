@@ -116,7 +116,7 @@ class ActiveCampaignSpec extends ObjectBehavior
         $this->shouldThrow(RuntimeException::class)->during('getDeal', [789]);
     }
 
-    function it_should_add_custom_fields(Client $client)
+    function it_should_add_deal_custom_fields(Client $client)
     {
         $this->beConstructedWith($client, '123', '456');
         $headers = [
@@ -168,7 +168,7 @@ class ActiveCampaignSpec extends ObjectBehavior
         $this->getDeal(789)->shouldReturn($expected);
     }
 
-    function it_should_throw_an_bad_custom_field_names()
+    function it_should_throw_an_bad_deal_custom_field_names()
     {
         $this->shouldThrow()->duringUpdateDealCustomField(1, 'bad_id', 'value');
         $this->shouldThrow()->duringUpdateDealCustomField(1, 'cåstom_field_1', 'value');
@@ -177,7 +177,7 @@ class ActiveCampaignSpec extends ObjectBehavior
         $this->shouldThrow()->duringUpdateDealCustomField(1, '1', 'value');
     }
 
-    function it_should_update_existing_custom_field(Client $client)
+    function it_should_update_existing_deal_custom_field(Client $client)
     {
         $this->beConstructedWith($client, '123', '456');
         $headers = [
@@ -222,7 +222,7 @@ class ActiveCampaignSpec extends ObjectBehavior
         $this->updateDealCustomField(42, 'custom_field_2', 3);
     }
 
-    function it_should_create_unset_custom_field(Client $client)
+    function it_should_create_unset_deal_custom_field(Client $client)
     {
         $this->beConstructedWith($client, '123', '456');
         $headers = [
@@ -254,7 +254,7 @@ class ActiveCampaignSpec extends ObjectBehavior
         $this->updateDealCustomField(42, 'custom_field_2', 3);
     }
 
-    function it_should_handle_empty_custom_fields(Client $client)
+    function it_should_handle_empty_deal_custom_fields(Client $client)
     {
         $this->beConstructedWith($client, '123', '456');
         $headers = [
@@ -294,5 +294,27 @@ class ActiveCampaignSpec extends ObjectBehavior
             'custom_field_1' => null,
         ];
         $this->getDeal(789)->shouldReturn($expected);
+    }
+
+    function it_should_get_contacts(Client $client)
+    {
+        $this->beConstructedWith($client, '123', '456');
+        $headers = [
+            'Api-Token' => '456',
+        ];
+        //https://1499693424850.api-us1.com/api/3/contacts/688
+        $response = $this->response([
+            'contact' => [
+                'id' => 688,
+            ],
+        ]);
+        $client->request(
+            'GET',
+            'https://123.api-us1.com/api/3/contacts/688',
+            ['headers' => $headers]
+        )->willReturn($response);
+
+
+        $this->getContact(688)->shouldReturn(['id' => 688]);
     }
 }

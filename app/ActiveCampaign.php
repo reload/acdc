@@ -127,4 +127,13 @@ class ActiveCampaign
             );
         }
     }
+
+    public function getContact($contactId)
+    {
+        $data = $this->call('GET', 'contacts/' . $contactId);
+        if (!isset($data['contact'])) {
+            throw new RuntimeException('Could not get contact data for ' . $contactId);
+        }
+        return $data['contact'];
+    }
 }
