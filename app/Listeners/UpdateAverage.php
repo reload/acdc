@@ -31,7 +31,7 @@ class UpdateAverage
     public function handle(DealUpdated $event)
     {
         try {
-            $deal = $this->activeCampaign->get($event->dealId);
+            $deal = $this->activeCampaign->getDeal($event->dealId);
         } catch (Throwable $e) {
             Log::error(sprintf('Error fetching deal %d: %s', $event->dealId, $e->getMessage()));
             return;
@@ -50,7 +50,7 @@ class UpdateAverage
 
         $average = $count > 0 ? $sum / $count : $sum;
 
-        $this->activeCampaign->updateCustomField($deal['id'], 'custom_field_8', $average);
+        $this->activeCampaign->updateDealCustomField($deal['id'], 'custom_field_8', $average);
         Log::info(sprintf("Updated deal %d with average.", $deal['id']));
     }
 }

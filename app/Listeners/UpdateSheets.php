@@ -25,7 +25,7 @@ class UpdateSheets extends SheetWriter
     public function handle(DealUpdated $event)
     {
         try {
-            $deal = $this->activeCampaign->get($event->dealId);
+            $deal = $this->activeCampaign->getDeal($event->dealId);
         } catch (Throwable $e) {
             Log::error(sprintf('Error fetching deal %d: %s', $event->dealId, $e->getMessage()));
             return;

@@ -45,7 +45,7 @@ class UpdateSheetsTest extends TestCase
         putenv('DEAL_SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->get(42)->willReturn($deal);
+        $ac->getDeal(42)->willReturn($deal);
 
         $sheets = $this->prophesize(Sheets::class);
         $sheets->header('the-sheet', 'the-tab')->willReturn(['banana']);
@@ -73,7 +73,7 @@ class UpdateSheetsTest extends TestCase
         putenv('DEAL_SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->get(42)->willReturn($deal);
+        $ac->getDeal(42)->willReturn($deal);
 
         $sheets = $this->prophesize(Sheets::class);
         $sheets->header('the-sheet', 'the-tab')->willReturn(['id', 'banana']);
@@ -104,7 +104,7 @@ class UpdateSheetsTest extends TestCase
         putenv('DEAL_SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->get(42)->willReturn($deal);
+        $ac->getDeal(42)->willReturn($deal);
 
         $sheets = $this->prophesize(Sheets::class);
         $sheets->header('the-sheet', 'the-tab')->willReturn(['id', 'cdate']);
@@ -141,7 +141,7 @@ class UpdateSheetsTest extends TestCase
         putenv('DEAL_SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->get(42)->willReturn($deal);
+        $ac->getDeal(42)->willReturn($deal);
 
         $sheets = $this->prophesize(Sheets::class);
         $sheets->header('the-sheet', 'the-tab')->willReturn(['name', 'id', 'some-value']);
@@ -170,7 +170,7 @@ class UpdateSheetsTest extends TestCase
         putenv('DEAL_SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->get(42)->willThrow(new RuntimeException('bad stuff'));
+        $ac->getDeal(42)->willThrow(new RuntimeException('bad stuff'));
 
         $sheets = $this->prophesize(Sheets::class);
 
@@ -201,7 +201,7 @@ class UpdateSheetsTest extends TestCase
         putenv('DEAL_SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->get(42)->willReturn($deal);
+        $ac->getDeal(42)->willReturn($deal);
 
         $sheets = $this->prophesize(Sheets::class);
         $sheets->header('the-sheet', 'the-tab')->willReturn(['name', 'id', 'some-value', 'cdate']);

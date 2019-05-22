@@ -39,6 +39,6 @@ class GetDeal extends Command
      */
     public function handle(ActiveCampaign $ac)
     {
-        print Yaml::dump($ac->get($this->argument('deal_id')));
+        print Yaml::dump($ac->getDeal($this->argument('deal_id')));
     }
 }

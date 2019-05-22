@@ -12,6 +12,10 @@ class UpdateAverageTest extends TestCase
 {
     public function testAverageUpdate()
     {
+        Log::shouldReceive('info')
+            ->with('Updated deal 42 with average.')
+            ->andReturn();
+
         $deal = [
             'id' => '42',
             'custom_field_1' => '3',
@@ -22,8 +26,8 @@ class UpdateAverageTest extends TestCase
         ];
 
         $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->get(42)->willReturn($deal);
-        $ac->updateCustomField(42, 'custom_field_8', 3)->shouldBeCalled();
+        $ac->getDeal(42)->willReturn($deal);
+        $ac->updateDealCustomField(42, 'custom_field_8', 3)->shouldBeCalled();
 
         $updater = new UpdateAverage($ac->reveal());
         $updater->handle(new DealUpdated(42));
@@ -38,8 +42,8 @@ class UpdateAverageTest extends TestCase
         ];
 
         $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->get(42)->willReturn($deal);
-        $ac->updateCustomField(42, 'custom_field_8', 2.8)->shouldBeCalled();
+        $ac->getDeal(42)->willReturn($deal);
+        $ac->updateDealCustomField(42, 'custom_field_8', 2.8)->shouldBeCalled();
 
         $updater = new UpdateAverage($ac->reveal());
         $updater->handle(new DealUpdated(42));
@@ -47,13 +51,17 @@ class UpdateAverageTest extends TestCase
 
     public function testNoData()
     {
+        Log::shouldReceive('info')
+            ->with('Updated deal 42 with average.')
+            ->andReturn();
+
         $deal = [
             'id' => '42',
         ];
 
         $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->get(42)->willReturn($deal);
-        $ac->updateCustomField(42, 'custom_field_8', 0)->shouldBeCalled();
+        $ac->getDeal(42)->willReturn($deal);
+        $ac->updateDealCustomField(42, 'custom_field_8', 0)->shouldBeCalled();
 
         $updater = new UpdateAverage($ac->reveal());
         $updater->handle(new DealUpdated(42));

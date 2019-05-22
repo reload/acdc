@@ -97,7 +97,7 @@ class ActiveCampaignSpec extends ObjectBehavior
             ['headers' => $headers]
         )->willReturn($response);
 
-        $this->get(789)->shouldReturn(['id' => 789]);
+        $this->getDeal(789)->shouldReturn(['id' => 789]);
     }
 
     function it_should_deal_with_bad_responses(Client $client)
@@ -113,7 +113,7 @@ class ActiveCampaignSpec extends ObjectBehavior
             ['headers' => $headers]
         )->willReturn($this->response([]));
 
-        $this->shouldThrow(RuntimeException::class)->during('get', [789]);
+        $this->shouldThrow(RuntimeException::class)->during('getDeal', [789]);
     }
 
     function it_should_add_custom_fields(Client $client)
@@ -165,16 +165,16 @@ class ActiveCampaignSpec extends ObjectBehavior
             'custom_field_2' => '5',
             'custom_field_3' => '7',
         ];
-        $this->get(789)->shouldReturn($expected);
+        $this->getDeal(789)->shouldReturn($expected);
     }
 
     function it_should_throw_an_bad_custom_field_names()
     {
-        $this->shouldThrow()->duringUpdateCustomField(1, 'bad_id', 'value');
-        $this->shouldThrow()->duringUpdateCustomField(1, 'cåstom_field_1', 'value');
-        $this->shouldThrow()->duringUpdateCustomField(1, 'custom_field_2_stuff', 'value');
-        $this->shouldThrow()->duringUpdateCustomField(1, 'custom_field_', 'value');
-        $this->shouldThrow()->duringUpdateCustomField(1, '1', 'value');
+        $this->shouldThrow()->duringUpdateDealCustomField(1, 'bad_id', 'value');
+        $this->shouldThrow()->duringUpdateDealCustomField(1, 'cåstom_field_1', 'value');
+        $this->shouldThrow()->duringUpdateDealCustomField(1, 'custom_field_2_stuff', 'value');
+        $this->shouldThrow()->duringUpdateDealCustomField(1, 'custom_field_', 'value');
+        $this->shouldThrow()->duringUpdateDealCustomField(1, '1', 'value');
     }
 
     function it_should_update_existing_custom_field(Client $client)
@@ -219,7 +219,7 @@ class ActiveCampaignSpec extends ObjectBehavior
             ['json' => $data, 'headers' => $headers]
         )->willReturn($this->response())->shouldBeCalled();
 
-        $this->updateCustomField(42, 'custom_field_2', 3);
+        $this->updateDealCustomField(42, 'custom_field_2', 3);
     }
 
     function it_should_create_unset_custom_field(Client $client)
@@ -251,7 +251,7 @@ class ActiveCampaignSpec extends ObjectBehavior
             ['json' => $data, 'headers' => $headers]
         )->willReturn($this->response())->shouldBeCalled();
 
-        $this->updateCustomField(42, 'custom_field_2', 3);
+        $this->updateDealCustomField(42, 'custom_field_2', 3);
     }
 
     function it_should_handle_empty_custom_fields(Client $client)
@@ -293,6 +293,6 @@ class ActiveCampaignSpec extends ObjectBehavior
             'id' => 789,
             'custom_field_1' => null,
         ];
-        $this->get(789)->shouldReturn($expected);
+        $this->getDeal(789)->shouldReturn($expected);
     }
 }
