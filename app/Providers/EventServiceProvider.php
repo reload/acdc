@@ -3,9 +3,12 @@
 namespace App\Providers;
 
 use App\Events\DealUpdated;
+use App\Events\ContactUpdated;
 use App\Listeners\DealUpdatedLogger;
+use App\Listeners\ContactUpdatedLogger;
 use App\Listeners\UpdateDealAverage;
 use App\Listeners\UpdateDealSheets;
+use App\Listeners\UpdateContactSheets;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -23,6 +26,10 @@ class EventServiceProvider extends ServiceProvider
             DealUpdatedLogger::class,
             UpdateDealAverage::class,
             UpdateDealSheets::class
+        ],
+        ContactUpdated::class => [
+            ContactUpdatedLogger::class,
+            UpdateContactSheets::class
         ],
     ];
 
