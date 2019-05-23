@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\ActiveCampaign;
-use App\Settings;
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,7 +26,6 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(ActiveCampaign::class, function ($app) {
-            $settings = $app->make(Settings::class);
             return new ActiveCampaign(
                 $app->make(Client::class),
                 env('ACTIVECAMPAIGN_ACCOUNT', ''),
