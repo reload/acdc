@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\ActiveCampaign;
 use App\Events\ContactUpdated;
 use App\Exceptions\UpdateSheetsException;
+use App\FieldTranslator;
 use App\SheetWriter;
 use App\Sheets;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,8 +14,22 @@ use Illuminate\Support\Facades\Log;
 use Symfony\Component\Yaml\Yaml;
 use Throwable;
 
-class UpdateContactSheets extends SheetWriter
+class UpdateContactSheets implements FieldTranslator
 {
+
+    protected $activeCampaign;
+    protected $sheetWriter;
+
+    /**
+     * Create the event listener.
+     *
+     * @return void
+     */
+    public function __construct(ActiveCampaign $activeCampaign, SheetWriter $sheetWriter)
+    {
+        $this->activeCampaign = $activeCampaign;
+        $this->sheetWriter = $sheetWriter;
+    }
 
     /**
      * Handle the event.
@@ -36,7 +51,7 @@ class UpdateContactSheets extends SheetWriter
         }
         foreach ($sheets as $sheet) {
             try {
-                if ($this->updateSheet($sheet, $contact) == SheetWriter::UPDATED) {
+                if ($this->sheetWriter->updateSheet($sheet, $contact, $this) == SheetWriter::UPDATED) {
                     Log::info(sprintf("Updated contact %d in Sheets.", $contact['id']));
                 } else {
                     Log::info(sprintf("Added contact %d to Sheets.", $contact['id']));

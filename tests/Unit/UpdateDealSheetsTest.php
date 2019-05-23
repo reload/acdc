@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use App\ActiveCampaign;
 use App\Events\DealUpdated;
 use App\Listeners\UpdateDealSheets;
+use App\SheetWriter;
 use App\Sheets;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
@@ -12,61 +13,15 @@ use Tests\TestCase;
 
 class UpdateDealSheetsTest extends TestCase
 {
-    public function testMapFunction()
-    {
-        // Suppress log output.
-        Log::spy();
-
-        $ac = $this->prophesize(ActiveCampaign::class);
-        $sheets = $this->prophesize(Sheets::class);
-
-        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
-
-        $deal = [
-            'id' => 12,
-            'name' => 'banana',
-            'ignored' => 'none',
-        ];
-        $map = [
-            2 => 'id',
-            1 => 'name',
-        ];
-
-        $this->assertEquals(['', 'banana', 12], $updater->map($deal, $map));
-
-        $deal = [
-            'id' => 12,
-            'name' => 'banana',
-            'ignored' => 'none',
-        ];
-        $map = [
-            1 => 'id',
-            3 => 'name',
-        ];
-
-        $this->assertEquals(['', 12, '', 'banana'], $updater->map($deal, $map));
-
-        $deal = [
-            'id' => 12,
-            'ignored' => 'none',
-        ];
-        $map = [
-            1 => 'id',
-            3 => 'name',
-        ];
-
-        $this->assertEquals(['', 12, '', ''], $updater->map($deal, $map));
-    }
-
     public function testDateTranslation()
     {
         // Suppress log output.
         Log::spy();
 
         $ac = $this->prophesize(ActiveCampaign::class);
-        $sheets = $this->prophesize(Sheets::class);
+        $writer = $this->prophesize(SheetWriter::class);
 
-        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $writer->reveal());
 
         $deal = [
             'untranslated' => '2019-02-13T03:12:08-06:00',
@@ -89,9 +44,9 @@ class UpdateDealSheetsTest extends TestCase
         Log::spy();
 
         $ac = $this->prophesize(ActiveCampaign::class);
-        $sheets = $this->prophesize(Sheets::class);
+        $writer = $this->prophesize(SheetWriter::class);
 
-        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $writer->reveal());
 
         $deal = [
             'untranslated' => '100000',
@@ -141,9 +96,9 @@ class UpdateDealSheetsTest extends TestCase
         Log::spy();
 
         $ac = $this->prophesize(ActiveCampaign::class);
-        $sheets = $this->prophesize(Sheets::class);
+        $writer = $this->prophesize(SheetWriter::class);
 
-        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $writer->reveal());
 
         $deal = [
             'cdate' => '2019-02-13T03:12:08-06:00',

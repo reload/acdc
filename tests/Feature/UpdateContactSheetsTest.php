@@ -6,8 +6,10 @@ use App\ActiveCampaign;
 use App\Events\ContactUpdated;
 use App\Exceptions\UpdateSheetsException;
 use App\Listeners\UpdateContactSheets;
+use App\SheetWriter;
 use App\Sheets;
 use Illuminate\Support\Facades\Log;
+use Prophecy\Argument;
 use RuntimeException;
 use Symfony\Component\Yaml\Yaml;
 use Tests\TestCase;
@@ -23,11 +25,12 @@ class UpdateContactSheetsTest extends TestCase
         $ac = $this->prophesize(ActiveCampaign::class);
         $sheets = $this->prophesize(Sheets::class);
 
-        $updater = new UpdateContactSheets($ac->reveal(), $sheets->reveal());
+        $sheetWriter = new SheetWriter($sheets->reveal());
+        $updater = new UpdateContactSheets($ac->reveal(), $sheetWriter);
         $updater->handle(new ContactUpdated(42));
     }
 
-    public function testMissingId()
+    public function testErrorLogging()
     {
         $contact = [
             'id' => '500',
@@ -41,116 +44,18 @@ class UpdateContactSheetsTest extends TestCase
             ],
         ];
 
-        Log::shouldReceive("error")->with('Error "The "id" field must be mapped." while mapping {"sheet":"the-sheet","tab":"the-tab"}')->once();
+        Log::shouldReceive("error")->with('Error "ERROR!" while mapping {"sheet":"the-sheet","tab":"the-tab"}')->once();
 
         putenv('CONTACT_SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->getContact(42)->willReturn($contact);
 
-        $sheets = $this->prophesize(Sheets::class);
-        $sheets->header('the-sheet', 'the-tab')->willReturn(['banana']);
+        $sheetWriter = $this->prophesize(SheetWriter::class);
+        $sheetWriter->updateSheet($sheets[0], $contact, Argument::any())
+            ->willThrow(new UpdateSheetsException("ERROR!"));
 
-        $updater = new UpdateContactSheets($ac->reveal(), $sheets->reveal());
-        $updater->handle(new ContactUpdated(42));
-    }
-
-    public function testMissingField()
-    {
-        Log::shouldReceive("warning")->with('Unknown field "banana".')->once();
-        Log::shouldReceive("info");
-
-        $contact = [
-            'id' => '500',
-        ];
-
-        $sheets = [
-            [
-                'sheet' => 'the-sheet',
-                'tab' => 'the-tab',
-            ],
-        ];
-
-        putenv('CONTACT_SHEETS=' . YAML::dump($sheets));
-
-        $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->getContact(42)->willReturn($contact);
-
-        $sheets = $this->prophesize(Sheets::class);
-        $sheets->header('the-sheet', 'the-tab')->willReturn(['id', 'banana']);
-        $sheets->data('the-sheet', 'the-tab')->willReturn([[]]);
-
-        $sheets->appendRow('the-sheet', 'the-tab', [500, ''])->shouldBeCalled();
-
-        $updater = new UpdateContactSheets($ac->reveal(), $sheets->reveal());
-        $updater->handle(new ContactUpdated(42));
-    }
-
-    public function testAppending()
-    {
-        Log::spy();
-        Log::shouldNotReceive('error');
-        $contact = [
-            'id' => '500',
-            'firstName' => 'Arthur',
-        ];
-
-        $sheets = [
-            [
-                'sheet' => 'the-sheet',
-                'tab' => 'the-tab',
-            ],
-        ];
-
-        putenv('CONTACT_SHEETS=' . YAML::dump($sheets));
-
-        $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->getContact(42)->willReturn($contact);
-
-        $sheets = $this->prophesize(Sheets::class);
-        $sheets->header('the-sheet', 'the-tab')->willReturn(['id', 'firstName']);
-        $sheets->data('the-sheet', 'the-tab')->willReturn([[]]);
-
-        $sheets->appendRow('the-sheet', 'the-tab', [500, 'Arthur'])->shouldBeCalled();
-
-        $updater = new UpdateContactSheets($ac->reveal(), $sheets->reveal());
-        $updater->handle(new ContactUpdated(42));
-    }
-
-    public function testUpdating()
-    {
-        Log::spy();
-        Log::shouldNotReceive('error');
-        $contact = [
-            'id' => '500',
-            'name' => 'new name',
-            'some-value' => '93.14'
-        ];
-
-        $sheet = [
-            ['one', 499],
-            ['two', 500],
-            ['three', 501],
-        ];
-        $sheets = [
-            [
-                'sheet' => 'the-sheet',
-                'tab' => 'the-tab',
-            ],
-        ];
-
-        putenv('CONTACT_SHEETS=' . YAML::dump($sheets));
-
-        $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->getContact(42)->willReturn($contact);
-
-        $sheets = $this->prophesize(Sheets::class);
-        $sheets->header('the-sheet', 'the-tab')->willReturn(['name', 'id', 'some-value']);
-        $sheets->data('the-sheet', 'the-tab')->willReturn($sheet);
-
-        $sheets->updateRow('the-sheet', 'the-tab', 2, ['new name', 500, '93.14'])->shouldBeCalled();
-
-        $updater = new UpdateContactSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateContactSheets($ac->reveal(), $sheetWriter->reveal());
         $updater->handle(new ContactUpdated(42));
     }
 
@@ -173,44 +78,32 @@ class UpdateContactSheetsTest extends TestCase
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->getContact(42)->willThrow(new RuntimeException('bad stuff'));
 
+        $sheetWriter = $this->prophesize(SheetWriter::class);
         $sheets = $this->prophesize(Sheets::class);
 
-        $updater = new UpdateContactSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateContactSheets($ac->reveal(), $sheetWriter->reveal());
         $updater->handle(new ContactUpdated(42));
     }
 
     public function testUpdatingDanish()
     {
-        Log::spy();
-        Log::shouldNotReceive('error');
-
-        $contact = [
-            'id' => '42',
-            'name' => 'new name',
-            'some-value' => '8.241',
-        ];
-
-        $sheets = [
-            [
-                'sheet' => 'the-sheet',
-                'tab' => 'the-tab',
-                'localeTranslate' => true,
-            ],
-        ];
-
-        putenv('CONTACT_SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->getContact(42)->willReturn($contact);
+        $sheetWriter = $this->prophesize(SheetWriter::class);
 
-        $sheets = $this->prophesize(Sheets::class);
-        $sheets->header('the-sheet', 'the-tab')->willReturn(['name', 'id', 'some-value']);
-        $sheets->data('the-sheet', 'the-tab')->willReturn([[]]);
+        $updater = new UpdateContactSheets($ac->reveal(), $sheetWriter->reveal());
 
-        $expected = ['new name', 42, '8,241'];
-        $sheets->appendRow('the-sheet', 'the-tab', $expected)->shouldBeCalled();
+        $data = [
+            'id' => 42,
+            'some_value' => '8.241',
+        ];
 
-        $updater = new UpdateContactSheets($ac->reveal(), $sheets->reveal());
-        $updater->handle(new ContactUpdated(42));
+        $expected = [
+            'id' => 42,
+            'some_value' => '8,241',
+        ];
+
+        $this->assertEquals($data, $updater->translateFields($data, false));
+        $this->assertEquals($expected, $updater->translateFields($data, true));
     }
 }

@@ -2,17 +2,15 @@
 
 namespace App;
 
-use App\ActiveCampaign;
 use App\Exceptions\UpdateSheetsException;
 use App\Sheets;
 use Illuminate\Support\Facades\Log;
 
-abstract class SheetWriter
+class SheetWriter
 {
     const UPDATED = 1;
     const INSERTED = 2;
 
-    protected $activeCampaign;
     protected $sheets;
 
     /**
@@ -20,31 +18,10 @@ abstract class SheetWriter
      *
      * @return void
      */
-    public function __construct(ActiveCampaign $activeCampaign, Sheets $sheets)
+    public function __construct(Sheets $sheets)
     {
-        $this->activeCampaign = $activeCampaign;
         $this->sheets = $sheets;
     }
-
-    /**
-     * "Translate" fields.
-     *
-     * Sheets has strong opinions on what it'll consider dates and decimal
-     * numbers depending on the locale of the sheet. Sadly there's no
-     * canonical representation, so we have to covert differently depending on
-     * whether it's an English sheet or danish one.
-     *
-     * Sub-classes should implement this to translate their data type.
-     *
-     * @param array $data
-     *   Data to translate.
-     * @param bool $localeTranslation
-     *   Whether it's a danish sheet.
-     *
-     * @return array
-     *   The translated data.
-     */
-    abstract public function translateFields($data, $localeTranslation = false);
 
     /**
      * Update sheet.
@@ -56,7 +33,7 @@ abstract class SheetWriter
      * @param array $data
      *   Row data to update/insert.
      */
-    protected function updateSheet($sheet, $data)
+    public function updateSheet($sheet, $data, FieldTranslator $translator)
     {
         $this->validateMapping($sheet);
 
@@ -67,7 +44,7 @@ abstract class SheetWriter
 
         $localeTranslation = isset($sheet['localeTranslate']);
         // Create new row.
-        $values = $this->map($this->translateFields($data, $localeTranslation), $fieldMapping);
+        $values = $this->map($translator->translateFields($data, $localeTranslation), $fieldMapping);
 
         // See if the row exists.
         $idCol = array_search('id', $fieldMapping);

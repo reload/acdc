@@ -6,8 +6,10 @@ use App\ActiveCampaign;
 use App\Events\DealUpdated;
 use App\Exceptions\UpdateSheetsException;
 use App\Listeners\UpdateDealSheets;
+use App\SheetWriter;
 use App\Sheets;
 use Illuminate\Support\Facades\Log;
+use Prophecy\Argument;
 use RuntimeException;
 use Symfony\Component\Yaml\Yaml;
 use Tests\TestCase;
@@ -23,14 +25,16 @@ class UpdateDealSheetsTest extends TestCase
         $ac = $this->prophesize(ActiveCampaign::class);
         $sheets = $this->prophesize(Sheets::class);
 
-        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
+        $sheetWriter = new SheetWriter($sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $sheetWriter);
         $updater->handle(new DealUpdated(42));
     }
 
-    public function testMissingId()
+    public function testErrorLogging()
     {
         $deal = [
             'id' => '500',
+            'firstName' => 'Athur',
         ];
 
         $sheets = [
@@ -40,116 +44,18 @@ class UpdateDealSheetsTest extends TestCase
             ],
         ];
 
-        Log::shouldReceive("error")->with('Error "The "id" field must be mapped." while mapping {"sheet":"the-sheet","tab":"the-tab"}')->once();
+        Log::shouldReceive("error")->with('Error "ERROR!" while mapping {"sheet":"the-sheet","tab":"the-tab"}')->once();
 
         putenv('DEAL_SHEETS=' . YAML::dump($sheets));
 
         $ac = $this->prophesize(ActiveCampaign::class);
         $ac->getDeal(42)->willReturn($deal);
 
-        $sheets = $this->prophesize(Sheets::class);
-        $sheets->header('the-sheet', 'the-tab')->willReturn(['banana']);
+        $sheetWriter = $this->prophesize(SheetWriter::class);
+        $sheetWriter->updateSheet($sheets[0], $deal, Argument::any())
+            ->willThrow(new UpdateSheetsException("ERROR!"));
 
-        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
-        $updater->handle(new DealUpdated(42));
-    }
-
-    public function testMissingField()
-    {
-        Log::shouldReceive("warning")->with('Unknown field "banana".')->once();
-        Log::shouldReceive("info");
-
-        $deal = [
-            'id' => '500',
-        ];
-
-        $sheets = [
-            [
-                'sheet' => 'the-sheet',
-                'tab' => 'the-tab',
-            ],
-        ];
-
-        putenv('DEAL_SHEETS=' . YAML::dump($sheets));
-
-        $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->getDeal(42)->willReturn($deal);
-
-        $sheets = $this->prophesize(Sheets::class);
-        $sheets->header('the-sheet', 'the-tab')->willReturn(['id', 'banana']);
-        $sheets->data('the-sheet', 'the-tab')->willReturn([[]]);
-
-        $sheets->appendRow('the-sheet', 'the-tab', [500, ''])->shouldBeCalled();
-
-        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
-        $updater->handle(new DealUpdated(42));
-    }
-
-    public function testAppending()
-    {
-        Log::spy();
-        Log::shouldNotReceive('error');
-        $deal = [
-            'id' => '500',
-            'cdate' => '2019-02-13T03:12:08-06:00',
-        ];
-
-        $sheets = [
-            [
-                'sheet' => 'the-sheet',
-                'tab' => 'the-tab',
-            ],
-        ];
-
-        putenv('DEAL_SHEETS=' . YAML::dump($sheets));
-
-        $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->getDeal(42)->willReturn($deal);
-
-        $sheets = $this->prophesize(Sheets::class);
-        $sheets->header('the-sheet', 'the-tab')->willReturn(['id', 'cdate']);
-        $sheets->data('the-sheet', 'the-tab')->willReturn([[]]);
-
-        $sheets->appendRow('the-sheet', 'the-tab', [500, '2019-02-13 09:12:08'])->shouldBeCalled();
-
-        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
-        $updater->handle(new DealUpdated(42));
-    }
-
-    public function testUpdating()
-    {
-        Log::spy();
-        Log::shouldNotReceive('error');
-        $deal = [
-            'id' => '500',
-            'name' => 'new name',
-            'some-value' => '93.14'
-        ];
-
-        $sheet = [
-            ['one', 499],
-            ['two', 500],
-            ['three', 501],
-        ];
-        $sheets = [
-            [
-                'sheet' => 'the-sheet',
-                'tab' => 'the-tab',
-            ],
-        ];
-
-        putenv('DEAL_SHEETS=' . YAML::dump($sheets));
-
-        $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->getDeal(42)->willReturn($deal);
-
-        $sheets = $this->prophesize(Sheets::class);
-        $sheets->header('the-sheet', 'the-tab')->willReturn(['name', 'id', 'some-value']);
-        $sheets->data('the-sheet', 'the-tab')->willReturn($sheet);
-
-        $sheets->updateRow('the-sheet', 'the-tab', 2, ['new name', 500, '93.14'])->shouldBeCalled();
-
-        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $sheetWriter->reveal());
         $updater->handle(new DealUpdated(42));
     }
 
@@ -174,43 +80,39 @@ class UpdateDealSheetsTest extends TestCase
 
         $sheets = $this->prophesize(Sheets::class);
 
-        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
+        $sheetWriter = new SheetWriter($sheets->reveal());
+        $updater = new UpdateDealSheets($ac->reveal(), $sheetWriter);
         $updater->handle(new DealUpdated(42));
     }
 
     public function testUpdatingDanish()
     {
-        Log::spy();
-        Log::shouldNotReceive('error');
+        $ac = $this->prophesize(ActiveCampaign::class);
+        $sheetWriter = $this->prophesize(SheetWriter::class);
+        $updater = new UpdateDealSheets($ac->reveal(), $sheetWriter->reveal());
 
-        $deal = [
+        $data = [
             'id' => '42',
             'name' => 'new name',
             'some-value' => '8.241',
             'cdate' => '2019-02-13T03:12:08-06:00',
         ];
 
-        $sheets = [
-            [
-                'sheet' => 'the-sheet',
-                'tab' => 'the-tab',
-                'localeTranslate' => true,
-            ],
+        $expected = [
+            'id' => '42',
+            'name' => 'new name',
+            'some-value' => '8.241',
+            'cdate' =>'2019-02-13 09:12:08',
         ];
 
-        putenv('DEAL_SHEETS=' . YAML::dump($sheets));
+        $expectedLocal = [
+            'id' => 42,
+            'name' => 'new name',
+            'some-value' => '8,241',
+            'cdate' =>'2019-02-13 09.12.08',
+        ];
 
-        $ac = $this->prophesize(ActiveCampaign::class);
-        $ac->getDeal(42)->willReturn($deal);
-
-        $sheets = $this->prophesize(Sheets::class);
-        $sheets->header('the-sheet', 'the-tab')->willReturn(['name', 'id', 'some-value', 'cdate']);
-        $sheets->data('the-sheet', 'the-tab')->willReturn([[]]);
-
-        $expected = ['new name', 42, '8,241', '2019-02-13 09.12.08'];
-        $sheets->appendRow('the-sheet', 'the-tab', $expected)->shouldBeCalled();
-
-        $updater = new UpdateDealSheets($ac->reveal(), $sheets->reveal());
-        $updater->handle(new DealUpdated(42));
+        $this->assertEquals($expected, $updater->translateFields($data, false));
+        $this->assertEquals($expectedLocal, $updater->translateFields($data, true));
     }
 }
