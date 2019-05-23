@@ -87,6 +87,7 @@ class ActiveCampaign
 
         // Find field id for the field instance on the deal.
         $fieldInstanceId = null;
+        $currentValue = null;
         $data = $this->getDealCustomFields($dealId);
         foreach ($data as $customField) {
             if (!isset($customField['customFieldId'])|| !isset($customField['id'])) {
@@ -94,23 +95,28 @@ class ActiveCampaign
             }
             if ($customField['customFieldId'] == $fieldId) {
                 $fieldInstanceId = $customField['id'];
+                if (isset($customField['fieldValue'])) {
+                    $currentValue = $customField['fieldValue'];
+                }
                 break;
             }
         }
 
         if ($fieldInstanceId) {
-            // If we have a field instance id, we're updating an existing
-            // value.
-            $data = [
-                'dealCustomFieldDatum' => [
-                    'fieldValue' => $value,
-                ],
-            ];
-            $this->call(
-                'PUT',
-                'dealCustomFieldData/' . $fieldInstanceId,
-                ['json' => $data]
-            );
+            if ($currentValue != $value) {
+                // If we have a field instance id, we're updating an existing
+                // value.
+                $data = [
+                    'dealCustomFieldDatum' => [
+                        'fieldValue' => $value,
+                    ],
+                ];
+                $this->call(
+                    'PUT',
+                    'dealCustomFieldData/' . $fieldInstanceId,
+                    ['json' => $data]
+                );
+            }
         } else {
             // Else POST the new value.
             $data = [

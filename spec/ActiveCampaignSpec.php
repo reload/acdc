@@ -296,6 +296,52 @@ class ActiveCampaignSpec extends ObjectBehavior
         $this->getDeal(789)->shouldReturn($expected);
     }
 
+    function it_should_not_update_existing_deal_custom_field_if_value_is_the_same(Client $client)
+    {
+        $this->beConstructedWith($client, '123', '456');
+        $headers = [
+            'Api-Token' => '456',
+        ];
+
+        $response = $this->response([
+            'dealCustomFieldData' => [
+                [
+                    'id' => 11,
+                    'customFieldId' => 1,
+                ],
+                [
+                    'id' => 12,
+                    'customFieldId' => 2,
+                    'fieldValue' => 3,
+                ],
+                [
+                    'id' => 13,
+                    'customFieldId' => 3,
+                ]
+            ]
+        ]);
+
+        $client->request(
+            'GET',
+            'https://123.api-us1.com/api/3/deals/42/dealCustomFieldData',
+            ['headers' => $headers]
+        )->willReturn($response);
+
+        $data = [
+            'dealCustomFieldDatum' => [
+                'fieldValue' => 3,
+            ],
+        ];
+
+        $client->request(
+            'PUT',
+            'https://123.api-us1.com/api/3/dealCustomFieldData/12',
+            Argument::any()
+        )->shouldNotBeCalled();
+
+        $this->updateDealCustomField(42, 'custom_field_2', 3);
+    }
+
     function it_should_get_contacts(Client $client)
     {
         $this->beConstructedWith($client, '123', '456');
