@@ -31,6 +31,7 @@ class ActiveCampaign
         $response = $this->client->request($method, $this->getUrl($path), $options + ['headers' => [
             'Api-Token' => $this->token,
         ]]);
+
         return json_decode($response->getBody(), true);
     }
 
@@ -140,6 +141,52 @@ class ActiveCampaign
         if (!isset($data['contact'])) {
             throw new RuntimeException('Could not get contact data for ' . $contactId);
         }
-        return $data['contact'];
+
+        $contact = $data['contact'];
+
+        // Add in field data.
+        if (isset($data['fieldValues'])) {
+            $fields = $this->getContactFields();
+
+            foreach ($data['fieldValues'] as $fieldValue) {
+                if (!isset($fieldValue['field']) || !isset($fieldValue['value'])) {
+                    throw new RuntimeException('Malformed contact field data on ' . $contactId);
+                }
+
+                if (isset($fields[$fieldValue['field']])) {
+                    $fieldName = $fields[$fieldValue['field']];
+                    $contact[$fieldName] = $fieldValue['value'];
+                }
+            }
+
+            // Add in any undefined fields.
+            foreach ($fields as $fieldName) {
+                if (!isset($contact[$fieldName])) {
+                    $contact[$fieldName] = '';
+                }
+            }
+        }
+
+
+        return $contact;
+    }
+
+    protected function getContactFields()
+    {
+        $fieldData = $this->call('GET', 'fields');
+
+        if (!isset($fieldData['fields'])) {
+            throw new RuntimeException('Could not get contact field definitions on ' . $contactId);
+        }
+
+        $fields = [];
+        foreach ($fieldData['fields'] as $field) {
+            if (!isset($field['id']) || !isset($field['perstag'])) {
+                throw new RuntimeException('Malformed contact field definition reply on ' . $contactId);
+            }
+            $fields[$field['id']] = 'field.' . strtolower($field['perstag']);
+        }
+
+        return $fields;
     }
 }

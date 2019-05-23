@@ -363,4 +363,69 @@ class ActiveCampaignSpec extends ObjectBehavior
 
         $this->getContact(688)->shouldReturn(['id' => 688]);
     }
+
+    /**
+     * Test that field data gets added to the contact.
+     *
+     * Field data should end up as "field." . strtolower(perstag).
+     */
+    function it_should_get_contact_fields(Client $client)
+    {
+        $this->beConstructedWith($client, '123', '456');
+        $headers = [
+            'Api-Token' => '456',
+        ];
+        //https://1499693424850.api-us1.com/api/3/contacts/688
+        $response = $this->response([
+            'contact' => [
+                'id' => 688,
+            ],
+            'fieldValues' => [
+                [
+                    'field' => 3,
+                    'value' => 'field-value',
+                ],
+                // "Undefined field" shouldn't trip it up.
+                [
+                    'field' => 4,
+                    'value' => 'should not get through',
+                ],
+            ]
+        ]);
+
+        $client->request(
+            'GET',
+            'https://123.api-us1.com/api/3/contacts/688',
+            ['headers' => $headers]
+        )->willReturn($response);
+
+
+        //https://1499693424850.api-us1.com/api/3/fields
+        $response = $this->response([
+            'fields' => [
+                [
+                    'id' => 3,
+                    'perstag' => 'THELABEL',
+                ],
+                // Field without a value.
+                [
+                    'id' => 2,
+                    'perstag' => 'EMPTYFIELD',
+                ],
+            ]
+        ]);
+        $client->request(
+            'GET',
+            'https://123.api-us1.com/api/3/fields',
+            ['headers' => $headers]
+        )->willReturn($response);
+
+        $expected = [
+            'id' => 688,
+            'field.thelabel' => 'field-value',
+            'field.emptyfield' => '',
+        ];
+
+        $this->getContact(688)->shouldReturn($expected);
+    }
 }
