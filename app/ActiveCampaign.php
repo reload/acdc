@@ -234,10 +234,14 @@ class ActiveCampaign
     {
         $scoreValues = $this->call('GET', 'contacts/' . $contactId . '/scoreValues');
 
-        if (!isset($scoreValues['scoreValues']['scoreValue'])) {
+        if (!isset($scoreValues['scoreValues'])) {
             throw new RuntimeException('Could not get contact lead_score on ' . $contactId);
         }
 
-        return (int) $scoreValues['scoreValues']['scoreValue'];
+        if (isset($scoreValues['scoreValues'][0]['scoreValue'])) {
+            return (int) $scoreValues['scoreValues'][0]['scoreValue'];
+        }
+
+        return 0;
     }
 }

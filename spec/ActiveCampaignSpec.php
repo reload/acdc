@@ -442,7 +442,7 @@ class ActiveCampaignSpec extends ObjectBehavior
         $this->expectRequest('contacts/688/contactTags', ['contactTags' => []]);
 
         //https://1499693424850.api-us1.com/api/3/contacts/688/scoreValues
-        $this->expectRequest('contacts/688/scoreValues', ['scoreValues' => ['scoreValue' => '42']]);
+        $this->expectRequest('contacts/688/scoreValues', ['scoreValues' => [['scoreValue' => '42']]]);
 
         $this->getContact(688)->shouldReturn([
             'id' => 688,
