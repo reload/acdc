@@ -12,9 +12,42 @@ use RuntimeException;
 
 class ActiveCampaignSpec extends ObjectBehavior
 {
+    protected $client;
+    protected $account;
+    protected $token;
+
     function let(Client $client)
     {
         $this->beConstructedWith($client);
+    }
+
+    /**
+     * Set constructor parameters.
+     *
+     * Overridden so we can grab the arguments for later usage.
+     */
+    function beConstructedWith($client, $account = null, $token = null)
+    {
+        parent::beConstructedWith($client, $account, $token);
+        $this->client = $client;
+        $this->account = $account;
+        $this->token = $token;
+    }
+
+    /**
+     * Expect a request.
+     */
+    function expectRequest($path, $reply)
+    {
+        $headers = [
+            'Api-Token' => $this->token,
+        ];
+        $response = $this->response($reply);
+        $this->client->request(
+            'GET',
+            'https://' . $this->account. '.api-us1.com/api/3/' . $path,
+            ['headers' => $headers]
+        )->willReturn($response)->shouldBeCalled();
     }
 
     /**
@@ -74,28 +107,16 @@ class ActiveCampaignSpec extends ObjectBehavior
     function it_should_get_deals(Client $client)
     {
         $this->beConstructedWith($client, '123', '456');
-        $headers = [
-            'Api-Token' => '456',
-        ];
+
         //https://1499693424850.api-us1.com/api/3/deals/789
-        $response = $this->response([
+        $this->expectRequest('deals/789', [
             'deal' => [
                 'id' => 789,
             ],
         ]);
-        $client->request(
-            'GET',
-            'https://123.api-us1.com/api/3/deals/789',
-            ['headers' => $headers]
-        )->willReturn($response);
 
         // https://1499693424850.api-us1.com/api/3/deals/789/dealCustomFieldData
-        $response = $this->response(['dealCustomFieldData' => []]);
-        $client->request(
-            'GET',
-            'https://123.api-us1.com/api/3/deals/789/dealCustomFieldData',
-            ['headers' => $headers]
-        )->willReturn($response);
+        $this->expectRequest('deals/789/dealCustomFieldData', ['dealCustomFieldData' => []]);
 
         $this->getDeal(789)->shouldReturn(['id' => 789]);
     }
@@ -107,11 +128,7 @@ class ActiveCampaignSpec extends ObjectBehavior
             'Api-Token' => '456',
         ];
 
-        $client->request(
-            'GET',
-            'https://123.api-us1.com/api/3/deals/789',
-            ['headers' => $headers]
-        )->willReturn($this->response([]));
+        $this->expectRequest('deals/789', []);
 
         $this->shouldThrow(RuntimeException::class)->during('getDeal', [789]);
     }
@@ -119,24 +136,16 @@ class ActiveCampaignSpec extends ObjectBehavior
     function it_should_add_deal_custom_fields(Client $client)
     {
         $this->beConstructedWith($client, '123', '456');
-        $headers = [
-            'Api-Token' => '456',
-        ];
+
         // https://1499693424850.api-us1.com/api/3/deals/789
-        $response = $this->response([
+        $this->expectRequest('deals/789', [
             'deal' => [
                 'id' => 789,
             ],
         ]);
 
-        $client->request(
-            'GET',
-            'https://123.api-us1.com/api/3/deals/789',
-            ['headers' => $headers]
-        )->willReturn($response);
-
         // https://1499693424850.api-us1.com/api/3/deals/789/dealCustomFieldData
-        $response = $this->response([
+        $this->expectRequest('deals/789/dealCustomFieldData', [
             'dealCustomFieldData' => [
                 [
                     'customFieldId' => 1,
@@ -152,12 +161,6 @@ class ActiveCampaignSpec extends ObjectBehavior
                 ]
             ]
         ]);
-
-        $client->request(
-            'GET',
-            'https://123.api-us1.com/api/3/deals/789/dealCustomFieldData',
-            ['headers' => $headers]
-        )->willReturn($response);
 
         $expected = [
             'id' => 789,
@@ -180,11 +183,12 @@ class ActiveCampaignSpec extends ObjectBehavior
     function it_should_update_existing_deal_custom_field(Client $client)
     {
         $this->beConstructedWith($client, '123', '456');
+
         $headers = [
             'Api-Token' => '456',
         ];
 
-        $response = $this->response([
+        $this->expectRequest('deals/42/dealCustomFieldData', [
             'dealCustomFieldData' => [
                 [
                     'id' => 11,
@@ -200,12 +204,6 @@ class ActiveCampaignSpec extends ObjectBehavior
                 ]
             ]
         ]);
-
-        $client->request(
-            'GET',
-            'https://123.api-us1.com/api/3/deals/42/dealCustomFieldData',
-            ['headers' => $headers]
-        )->willReturn($response);
 
         $data = [
             'dealCustomFieldDatum' => [
@@ -229,13 +227,7 @@ class ActiveCampaignSpec extends ObjectBehavior
             'Api-Token' => '456',
         ];
 
-        $response = $this->response(['dealCustomFieldData' => []]);
-
-        $client->request(
-            'GET',
-            'https://123.api-us1.com/api/3/deals/42/dealCustomFieldData',
-            ['headers' => $headers]
-        )->willReturn($response);
+        $this->expectRequest('deals/42/dealCustomFieldData', ['dealCustomFieldData' => []]);
 
         $data = [
             'dealCustomFieldDatum' => [
@@ -257,24 +249,16 @@ class ActiveCampaignSpec extends ObjectBehavior
     function it_should_handle_empty_deal_custom_fields(Client $client)
     {
         $this->beConstructedWith($client, '123', '456');
-        $headers = [
-            'Api-Token' => '456',
-        ];
+
         // https://1499693424850.api-us1.com/api/3/deals/789
-        $response = $this->response([
+        $this->expectRequest('deals/789', [
             'deal' => [
                 'id' => 789,
             ],
         ]);
 
-        $client->request(
-            'GET',
-            'https://123.api-us1.com/api/3/deals/789',
-            ['headers' => $headers]
-        )->willReturn($response);
-
         // https://1499693424850.api-us1.com/api/3/deals/789/dealCustomFieldData
-        $response = $this->response([
+        $this->expectRequest('deals/789/dealCustomFieldData', [
             'dealCustomFieldData' => [
                 [
                     'customFieldId' => 1,
@@ -282,12 +266,6 @@ class ActiveCampaignSpec extends ObjectBehavior
                 ],
             ]
         ]);
-
-        $client->request(
-            'GET',
-            'https://123.api-us1.com/api/3/deals/789/dealCustomFieldData',
-            ['headers' => $headers]
-        )->willReturn($response);
 
         $expected = [
             'id' => 789,
@@ -303,7 +281,7 @@ class ActiveCampaignSpec extends ObjectBehavior
             'Api-Token' => '456',
         ];
 
-        $response = $this->response([
+        $this->expectRequest('deals/42/dealCustomFieldData', [
             'dealCustomFieldData' => [
                 [
                     'id' => 11,
@@ -320,12 +298,6 @@ class ActiveCampaignSpec extends ObjectBehavior
                 ]
             ]
         ]);
-
-        $client->request(
-            'GET',
-            'https://123.api-us1.com/api/3/deals/42/dealCustomFieldData',
-            ['headers' => $headers]
-        )->willReturn($response);
 
         $data = [
             'dealCustomFieldDatum' => [
@@ -345,21 +317,13 @@ class ActiveCampaignSpec extends ObjectBehavior
     function it_should_get_contacts(Client $client)
     {
         $this->beConstructedWith($client, '123', '456');
-        $headers = [
-            'Api-Token' => '456',
-        ];
+
         //https://1499693424850.api-us1.com/api/3/contacts/688
-        $response = $this->response([
+        $this->expectRequest('contacts/688', [
             'contact' => [
                 'id' => 688,
             ],
         ]);
-        $client->request(
-            'GET',
-            'https://123.api-us1.com/api/3/contacts/688',
-            ['headers' => $headers]
-        )->willReturn($response);
-
 
         $this->getContact(688)->shouldReturn(['id' => 688]);
     }
@@ -372,11 +336,9 @@ class ActiveCampaignSpec extends ObjectBehavior
     function it_should_get_contact_fields(Client $client)
     {
         $this->beConstructedWith($client, '123', '456');
-        $headers = [
-            'Api-Token' => '456',
-        ];
+
         //https://1499693424850.api-us1.com/api/3/contacts/688
-        $response = $this->response([
+        $this->expectRequest('contacts/688', [
             'contact' => [
                 'id' => 688,
             ],
@@ -393,15 +355,9 @@ class ActiveCampaignSpec extends ObjectBehavior
             ]
         ]);
 
-        $client->request(
-            'GET',
-            'https://123.api-us1.com/api/3/contacts/688',
-            ['headers' => $headers]
-        )->willReturn($response);
-
 
         //https://1499693424850.api-us1.com/api/3/fields
-        $response = $this->response([
+        $this->expectRequest('fields', [
             'fields' => [
                 [
                     'id' => 3,
@@ -414,11 +370,6 @@ class ActiveCampaignSpec extends ObjectBehavior
                 ],
             ]
         ]);
-        $client->request(
-            'GET',
-            'https://123.api-us1.com/api/3/fields',
-            ['headers' => $headers]
-        )->willReturn($response);
 
         $expected = [
             'id' => 688,
