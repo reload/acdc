@@ -13,6 +13,8 @@ hashes, where each hash has `sheet` (sheet id), `tab` (name of tab to
 import too) and optionally `localeTranslate`, a boolean indicating
 whether to use danish formatting.
 
+`CONTACT_SHEETS`: Same as `DEAL_SHEETS`, for contacts.
+
 ## Artisan commands
 
 ``` shell
