@@ -81,6 +81,18 @@ class UpdateContactSheets implements FieldTranslator
      */
     public function translateFields($contact, $localeTranslation = false)
     {
+        // Render dates so sheets will see them as such.
+        foreach (['cdate', 'adate', 'edate', 'udate'] as $field) {
+            if (isset($contact[$field])) {
+                $time = strtotime($contact[$field]);
+                if ($localeTranslation) {
+                    $contact[$field] = date('Y-m-d H.i.s', $time);
+                } else {
+                    $contact[$field] = date('Y-m-d H:i:s', $time);
+                }
+            }
+        }
+
         // Replace decimal separator.
         if ($localeTranslation) {
             foreach ($contact as $key => $value) {
