@@ -325,7 +325,10 @@ class ActiveCampaignSpec extends ObjectBehavior
             ],
         ]);
 
-        $this->getContact(688)->shouldReturn(['id' => 688]);
+        //https://1499693424850.api-us1.com/api/3/contacts/688/contactTags
+        $this->expectRequest('contacts/688/contactTags', ['contactTags' => []]);
+
+        $this->getContact(688)->shouldReturn(['id' => 688, 'tags' => '']);
     }
 
     /**
@@ -355,6 +358,9 @@ class ActiveCampaignSpec extends ObjectBehavior
             ]
         ]);
 
+        //https://1499693424850.api-us1.com/api/3/contacts/688/contactTags
+        $this->expectRequest('contacts/688/contactTags', ['contactTags' => []]);
+
 
         //https://1499693424850.api-us1.com/api/3/fields
         $this->expectRequest('fields', [
@@ -375,8 +381,39 @@ class ActiveCampaignSpec extends ObjectBehavior
             'id' => 688,
             'field.thelabel' => 'field-value',
             'field.emptyfield' => '',
+            'tags' => '',
         ];
 
         $this->getContact(688)->shouldReturn($expected);
+    }
+
+    function it_should_get_contact_tags(Client $client)
+    {
+        $this->beConstructedWith($client, '123', '456');
+        //https://1499693424850.api-us1.com/api/3/contacts/688
+        $this->expectRequest('contacts/688', [
+            'contact' => [
+                'id' => 688,
+            ],
+        ]);
+
+        //https://1499693424850.api-us1.com/api/3/contacts/688/contactTags
+        $this->expectRequest('contacts/688/contactTags', [
+            'contactTags' => [
+                ['id' => '4115'],
+                ['id' => '5489'],
+                ['id' => '6783'],
+            ]
+        ]);
+
+        //https://1499693424850.api-us1.com/api/3/contactTags/<id>/tag
+        $this->expectRequest('contactTags/4115/tag', ['tag' => ['tag' => 'velkomst-flow-skipped']]);
+        $this->expectRequest('contactTags/5489/tag', ['tag' => ['tag' => 'newsletter']]);
+        $this->expectRequest('contactTags/6783/tag', ['tag' => ['tag' => 'e-bog-syv-skridt-til-succes']]);
+
+        $this->getContact(688)->shouldReturn([
+            'id' => 688,
+            'tags' => "velkomst-flow-skipped, newsletter, e-bog-syv-skridt-til-succes",
+        ]);
     }
 }

@@ -167,6 +167,8 @@ class ActiveCampaign
             }
         }
 
+        // Add contact tags.
+        $contact['tags'] = implode(', ', $this->getContactTagNames($this->getContactTags($contactId)));
 
         return $contact;
     }
@@ -188,5 +190,40 @@ class ActiveCampaign
         }
 
         return $fields;
+    }
+
+    protected function getContactTags(string $contactId)
+    {
+        $tagData = $this->call('GET', 'contacts/' . $contactId . '/contactTags');
+
+        if (!isset($tagData['contactTags'])) {
+            throw new RuntimeException('Could not get contact tags on ' . $contactId);
+        }
+
+        $tags = [];
+        foreach ($tagData['contactTags'] as $tag) {
+            if (!isset($tag['id'])) {
+                throw new RuntimeException('Malformed contact tag reply on ' . $contactId);
+            }
+            $tags[] = $tag['id'];
+        }
+
+        return $tags;
+    }
+
+    protected function getContactTagNames(array $tagIds)
+    {
+        $names = [];
+        foreach ($tagIds as $tagId) {
+            $tagData = $this->call('GET', 'contactTags/' . $tagId . '/tag');
+
+            if (!isset($tagData['tag']['tag'])) {
+                throw new RuntimeException('Could not get name for contact tag id ' . $tagId);
+            }
+
+            $names[] = $tagData['tag']['tag'];
+        }
+
+        return $names;
     }
 }
