@@ -328,7 +328,10 @@ class ActiveCampaignSpec extends ObjectBehavior
         //https://1499693424850.api-us1.com/api/3/contacts/688/contactTags
         $this->expectRequest('contacts/688/contactTags', ['contactTags' => []]);
 
-        $this->getContact(688)->shouldReturn(['id' => 688, 'tags' => '']);
+        //https://1499693424850.api-us1.com/api/3/contacts/688/scoreValues
+        $this->expectRequest('contacts/688/scoreValues', ['scoreValues' => ['scoreValue' => '']]);
+
+        $this->getContact(688)->shouldReturn(['id' => 688, 'tags' => '', 'lead_score' => 0]);
     }
 
     /**
@@ -377,11 +380,15 @@ class ActiveCampaignSpec extends ObjectBehavior
             ]
         ]);
 
+        //https://1499693424850.api-us1.com/api/3/contacts/688/scoreValues
+        $this->expectRequest('contacts/688/scoreValues', ['scoreValues' => ['scoreValue' => '']]);
+
         $expected = [
             'id' => 688,
             'field.thelabel' => 'field-value',
             'field.emptyfield' => '',
             'tags' => '',
+            'lead_score' => 0,
         ];
 
         $this->getContact(688)->shouldReturn($expected);
@@ -411,9 +418,36 @@ class ActiveCampaignSpec extends ObjectBehavior
         $this->expectRequest('contactTags/5489/tag', ['tag' => ['tag' => 'newsletter']]);
         $this->expectRequest('contactTags/6783/tag', ['tag' => ['tag' => 'e-bog-syv-skridt-til-succes']]);
 
+        //https://1499693424850.api-us1.com/api/3/contacts/688/scoreValues
+        $this->expectRequest('contacts/688/scoreValues', ['scoreValues' => ['scoreValue' => '']]);
+
         $this->getContact(688)->shouldReturn([
             'id' => 688,
             'tags' => "velkomst-flow-skipped, newsletter, e-bog-syv-skridt-til-succes",
+            'lead_score' => 0,
+        ]);
+    }
+
+    function it_should_get_contact_lead_score(Client $client)
+    {
+        $this->beConstructedWith($client, '123', '456');
+        //https://1499693424850.api-us1.com/api/3/contacts/688
+        $this->expectRequest('contacts/688', [
+            'contact' => [
+                'id' => 688,
+            ],
+        ]);
+
+        //https://1499693424850.api-us1.com/api/3/contacts/688/contactTags
+        $this->expectRequest('contacts/688/contactTags', ['contactTags' => []]);
+
+        //https://1499693424850.api-us1.com/api/3/contacts/688/scoreValues
+        $this->expectRequest('contacts/688/scoreValues', ['scoreValues' => ['scoreValue' => '42']]);
+
+        $this->getContact(688)->shouldReturn([
+            'id' => 688,
+            'tags' => '',
+            'lead_score' => 42,
         ]);
     }
 }

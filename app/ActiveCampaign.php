@@ -170,6 +170,9 @@ class ActiveCampaign
         // Add contact tags.
         $contact['tags'] = implode(', ', $this->getContactTagNames($this->getContactTags($contactId)));
 
+        // Add lead score.
+        $contact['lead_score'] = $this->getContactLeadScore($contactId);
+
         return $contact;
     }
 
@@ -225,5 +228,16 @@ class ActiveCampaign
         }
 
         return $names;
+    }
+
+    protected function getContactLeadScore(string $contactId)
+    {
+        $scoreValues = $this->call('GET', 'contacts/' . $contactId . '/scoreValues');
+
+        if (!isset($scoreValues['scoreValues']['scoreValue'])) {
+            throw new RuntimeException('Could not get contact lead_score on ' . $contactId);
+        }
+
+        return (int) $scoreValues['scoreValues']['scoreValue'];
     }
 }
