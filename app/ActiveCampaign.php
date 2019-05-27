@@ -155,7 +155,8 @@ class ActiveCampaign
 
                 if (isset($fields[$fieldValue['field']])) {
                     $fieldName = $fields[$fieldValue['field']];
-                    $contact[$fieldName] = $fieldValue['value'];
+                    // Strip pipes around name.
+                    $contact[$fieldName] = trim($fieldValue['value'], '|');
                 }
             }
 

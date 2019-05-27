@@ -338,6 +338,9 @@ class ActiveCampaignSpec extends ObjectBehavior
      * Test that field data gets added to the contact.
      *
      * Field data should end up as "field." . strtolower(perstag).
+     *
+     * Fields should be stripped of pipes around the name (they're added to
+     * checkbox fields).
      */
     function it_should_get_contact_fields(Client $client)
     {
@@ -352,6 +355,10 @@ class ActiveCampaignSpec extends ObjectBehavior
                 [
                     'field' => 3,
                     'value' => 'field-value',
+                ],
+                [
+                    'field' => 7,
+                    'value' => '||no-pipes||',
                 ],
                 // "Undefined field" shouldn't trip it up.
                 [
@@ -372,6 +379,10 @@ class ActiveCampaignSpec extends ObjectBehavior
                     'id' => 3,
                     'perstag' => 'THELABEL',
                 ],
+                [
+                    'id' => 7,
+                    'perstag' => 'PIPETEST',
+                ],
                 // Field without a value.
                 [
                     'id' => 2,
@@ -386,6 +397,7 @@ class ActiveCampaignSpec extends ObjectBehavior
         $expected = [
             'id' => 688,
             'field.thelabel' => 'field-value',
+            'field.pipetest' => 'no-pipes',
             'field.emptyfield' => '',
             'tags' => '',
             'lead_score' => 0,
