@@ -214,11 +214,6 @@ class ActiveCampaign
         return $tags;
     }
 
-    /**
-     * Get the tag names for the given ids.
-     *
-     * Trims any | surrounding the tag name.
-     */
     protected function getContactTagNames(array $tagIds)
     {
         $names = [];
@@ -229,7 +224,7 @@ class ActiveCampaign
                 throw new RuntimeException('Could not get name for contact tag id ' . $tagId);
             }
 
-            $names[] = trim($tagData['tag']['tag'], '|');
+            $names[] = $tagData['tag']['tag'];
         }
 
         return $names;
