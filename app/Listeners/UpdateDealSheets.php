@@ -8,6 +8,7 @@ use App\Exceptions\UpdateSheetsException;
 use App\FieldTranslator;
 use App\SheetWriter;
 use App\Sheets;
+use App\TranslatesFields;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +17,7 @@ use Throwable;
 
 class UpdateDealSheets implements FieldTranslator
 {
+    use TranslatesFields;
 
     protected $activeCampaign;
     protected $sheetWriter;
@@ -84,32 +86,19 @@ class UpdateDealSheets implements FieldTranslator
         // Render dates so sheets will see them as such.
         foreach (['cdate', 'mdate'] as $field) {
             if (isset($deal[$field])) {
-                $dateTime = new \DateTime($deal[$field]);
-                if ($localeTranslation) {
-                    $timezone = new \DateTimeZone('Europe/Copenhagen');
-                    $dateTime->setTimezone($timezone);
-                    $deal[$field] = $dateTime->format('Y-m-d H.i.s');
-                } else {
-                    $timezone = new \DateTimeZone('UTC');
-                    $dateTime->setTimezone($timezone);
-                    $deal[$field] = $dateTime->format('Y-m-d H:i:s');
-                }
+                $deal[$field] = $this->translateDate($deal[$field], $localeTranslation);
             }
         }
 
         // AC uses lowest denominator for currencies, translate to everyday
         // use.
         if (isset($deal['value'])) {
-            $deal['value'] = round($deal['value'] / 100);
+            $deal['value'] = $this->translateAmount($deal['value']);
         }
 
         // Replace decimal separator.
-        if ($localeTranslation) {
-            foreach ($deal as $key => $value) {
-                if (is_string($value) && preg_match('/^\d+\.\d+$/', $value)) {
-                    $deal[$key] = strtr($value, ['.' => ',']);
-                }
-            }
+        foreach ($deal as $key => $value) {
+            $deal[$key] = $this->translateDecimalSeperator($deal[$key], $localeTranslation);
         }
 
         return $deal;

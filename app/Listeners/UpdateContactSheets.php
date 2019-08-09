@@ -8,6 +8,7 @@ use App\Exceptions\UpdateSheetsException;
 use App\FieldTranslator;
 use App\SheetWriter;
 use App\Sheets;
+use App\TranslatesFields;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +17,7 @@ use Throwable;
 
 class UpdateContactSheets implements FieldTranslator
 {
+    use TranslatesFields;
 
     protected $activeCampaign;
     protected $sheetWriter;
@@ -84,26 +86,13 @@ class UpdateContactSheets implements FieldTranslator
         // Render dates so sheets will see them as such.
         foreach (['cdate', 'adate', 'edate', 'udate'] as $field) {
             if (isset($contact[$field])) {
-                $dateTime = new \DateTime($contact[$field]);
-                if ($localeTranslation) {
-                    $timezone = new \DateTimeZone('Europe/Copenhagen');
-                    $dateTime->setTimezone($timezone);
-                    $contact[$field] = $dateTime->format('Y-m-d H.i.s');
-                } else {
-                    $timezone = new \DateTimeZone('UTC');
-                    $dateTime->setTimezone($timezone);
-                    $contact[$field] = $dateTime->format('Y-m-d H:i:s');
-                }
+                $contact[$field] = $this->translateDate($contact[$field], $localeTranslation);
             }
         }
 
         // Replace decimal separator.
-        if ($localeTranslation) {
-            foreach ($contact as $key => $value) {
-                if (is_string($value) && preg_match('/^\d+\.\d+$/', $value)) {
-                    $contact[$key] = strtr($value, ['.' => ',']);
-                }
-            }
+        foreach ($contact as $key => $value) {
+            $contact[$key] = $this->translateDecimalSeperator($contact[$key], $localeTranslation);
         }
 
         return $contact;
