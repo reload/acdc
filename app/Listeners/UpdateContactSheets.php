@@ -84,11 +84,15 @@ class UpdateContactSheets implements FieldTranslator
         // Render dates so sheets will see them as such.
         foreach (['cdate', 'adate', 'edate', 'udate'] as $field) {
             if (isset($contact[$field])) {
-                $time = strtotime($contact[$field]);
+                $dateTime = new \DateTime($contact[$field]);
                 if ($localeTranslation) {
-                    $contact[$field] = date('Y-m-d H.i.s', $time);
+                    $timezone = new \DateTimeZone('Europe/Copenhagen');
+                    $dateTime->setTimezone($timezone);
+                    $contact[$field] = $dateTime->format('Y-m-d H.i.s');
                 } else {
-                    $contact[$field] = date('Y-m-d H:i:s', $time);
+                    $timezone = new \DateTimeZone('UTC');
+                    $dateTime->setTimezone($timezone);
+                    $contact[$field] = $dateTime->format('Y-m-d H:i:s');
                 }
             }
         }

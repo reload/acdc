@@ -109,7 +109,7 @@ class UpdateDealSheetsTest extends TestCase
             'id' => 42,
             'name' => 'new name',
             'some-value' => '8,241',
-            'cdate' =>'2019-02-13 09.12.08',
+            'cdate' =>'2019-02-13 10.12.08',
         ];
 
         $this->assertEquals($expected, $updater->translateFields($data, false));

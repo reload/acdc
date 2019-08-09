@@ -84,11 +84,15 @@ class UpdateDealSheets implements FieldTranslator
         // Render dates so sheets will see them as such.
         foreach (['cdate', 'mdate'] as $field) {
             if (isset($deal[$field])) {
-                $time = strtotime($deal[$field]);
+                $dateTime = new \DateTime($deal[$field]);
                 if ($localeTranslation) {
-                    $deal[$field] = date('Y-m-d H.i.s', $time);
+                    $timezone = new \DateTimeZone('Europe/Copenhagen');
+                    $dateTime->setTimezone($timezone);
+                    $deal[$field] = $dateTime->format('Y-m-d H.i.s');
                 } else {
-                    $deal[$field] = date('Y-m-d H:i:s', $time);
+                    $timezone = new \DateTimeZone('UTC');
+                    $dateTime->setTimezone($timezone);
+                    $deal[$field] = $dateTime->format('Y-m-d H:i:s');
                 }
             }
         }

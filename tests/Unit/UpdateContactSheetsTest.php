@@ -61,10 +61,25 @@ class UpdateContactSheetsTest extends TestCase
         $this->assertEquals($expected, $this->updater->translateFields($contact));
 
         $expected = [
-            'cdate' => '2019-02-13 09.12.08',
+            'cdate' => '2019-02-13 10.12.08',
             'some-value' => '3,14',
             'some-array' => ['3.14'],
         ];
+        $this->assertEquals($expected, $this->updater->translateFields($contact, true));
+    }
+
+    public function testTimezoneTranslation()
+    {
+        $contact = [
+            'cdate' => '2019-02-13T03:12:08-06:00',
+            'adate' => '2019-06-13T03:12:08-06:00',
+        ];
+
+        $expected = [
+            'cdate' => '2019-02-13 10.12.08',
+            'adate' => '2019-06-13 11.12.08',
+        ];
+
         $this->assertEquals($expected, $this->updater->translateFields($contact, true));
     }
 }
