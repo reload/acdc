@@ -5611,16 +5611,16 @@
         },
         {
             "name": "sempro/phpunit-pretty-print",
-            "version": "1.1.9",
+            "version": "1.1.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sempro/phpunit-pretty-print.git",
-                "reference": "f7c4898b389f38fcec725ee4dce1a0ec0de85baa"
+                "reference": "7449efe3c2d4abdf32082caef7ba2b055194bd46"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sempro/phpunit-pretty-print/zipball/f7c4898b389f38fcec725ee4dce1a0ec0de85baa",
-                "reference": "f7c4898b389f38fcec725ee4dce1a0ec0de85baa",
+                "url": "https://api.github.com/repos/sempro/phpunit-pretty-print/zipball/7449efe3c2d4abdf32082caef7ba2b055194bd46",
+                "reference": "7449efe3c2d4abdf32082caef7ba2b055194bd46",
                 "shasum": ""
             },
             "require": {
@@ -5641,7 +5641,7 @@
                 "MIT"
             ],
             "description": "Prettify PHPUnit output",
-            "time": "2019-07-16T07:56:30+00:00"
+            "time": "2019-08-12T07:08:01+00:00"
         },
         {
             "name": "theseer/fdomdocument",
