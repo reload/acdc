@@ -1,4 +1,4 @@
-on: Push
+on: push
 name: Run tests
 
 jobs:
@@ -30,8 +30,8 @@ jobs:
         if: '!github.event.deleted'
         uses: docker://php:7.3-alpine
         with:
-          entrypoint: vendor/bin/phpcov
-          args: merge --clover=spec.xml coverage/spec.cov
+          entrypoint: phpdbg
+          args: -qrr vendor/bin/phpcov merge --clover=spec.xml coverage/spec.cov
       - name: 'Upload CodeCov report'
         if: '!github.event.deleted'
         uses: codecov/codecov-action@v1.0.2
@@ -61,8 +61,8 @@ jobs:
         if: '!github.event.deleted'
         uses: docker://php:7.3-alpine
         with:
-          entrypoint: vendor/bin/phpcov
-          args: merge --clover=unit.xml coverage/unit.cov
+          entrypoint: phpdbg
+          args: -qrr vendor/bin/phpcov merge --clover=unit.xml coverage/unit.cov
       - name: 'Upload CodeCov report'
         if: '!github.event.deleted'
         uses: codecov/codecov-action@v1.0.2
@@ -98,8 +98,8 @@ jobs:
         if: '!github.event.deleted'
         uses: docker://php:7.3-alpine
         with:
-          entrypoint: vendor/bin/phpcov
-          args: merge --clover=feature.xml coverage/feature.cov
+          entrypoint: phpdbg
+          args: -qrr vendor/bin/phpcov merge --clover=feature.xml coverage/feature.cov
       - name: 'Upload CodeCov report'
         if: '!github.event.deleted'
         uses: codecov/codecov-action@v1.0.2
