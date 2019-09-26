@@ -5,17 +5,15 @@ jobs:
   spec_tests:
     name: "Spec tests"
     runs-on: ubuntu-latest
+    if: '!github.event.deleted'
     steps:
       - name: 'Checkout code'
         uses: actions/checkout@master
-        if: '!github.event.deleted'
       - name: 'Composer install'
-        if: '!github.event.deleted'
         uses: MilesChou/composer-action@master
         with:
           args: install
       - name: 'Run spec tests'
-        if: '!github.event.deleted'
         uses: docker://php:7.3-alpine
         env:
           APP_KEY: "base64:Z++HhObkg1plehwZlK6RGSRVi4uWPiUGRYFoDOt2/Ig="
@@ -27,63 +25,57 @@ jobs:
           entrypoint: phpdbg
           args: -qrr vendor/bin/phpspec run
       - name: 'Merge coverage'
-        if: '!github.event.deleted'
         uses: docker://php:7.3-alpine
         with:
           entrypoint: phpdbg
           args: -qrr vendor/bin/phpcov merge --clover=spec.xml coverage/spec.cov
       - name: 'Upload CodeCov report'
-        if: '!github.event.deleted'
         uses: codecov/codecov-action@v1.0.2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./spec.xml
           flags: spec
+
   unit_tests:
     name: "Unit tests"
     runs-on: ubuntu-latest
+    if: '!github.event.deleted'
     steps:
       - name: 'Checkout code'
         uses: actions/checkout@master
-        if: '!github.event.deleted'
       - name: 'Composer install'
-        if: '!github.event.deleted'
         uses: MilesChou/composer-action@master
         with:
           args: install
       - name: 'Run unit tests'
-        if: '!github.event.deleted'
         uses: docker://php:7.3-alpine
         with:
           entrypoint: phpdbg
           args: -qrr vendor/bin/phpunit --testsuite Unit --coverage-php=coverage/unit.cov
       - name: 'Merge coverage'
-        if: '!github.event.deleted'
         uses: docker://php:7.3-alpine
         with:
           entrypoint: phpdbg
           args: -qrr vendor/bin/phpcov merge --clover=unit.xml coverage/unit.cov
       - name: 'Upload CodeCov report'
-        if: '!github.event.deleted'
         uses: codecov/codecov-action@v1.0.2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./unit.xml
           flags: unit
+
   feature_tests:
     name: "Feature tests"
     runs-on: ubuntu-latest
+    if: '!github.event.deleted'
     steps:
       - name: 'Checkout code'
         uses: actions/checkout@master
-        if: '!github.event.deleted'
       - name: 'Composer install'
-        if: '!github.event.deleted'
         uses: MilesChou/composer-action@master
         with:
           args: install
       - name: 'Run unit tests'
-        if: '!github.event.deleted'
         uses: docker://php:7.3-alpine
         env:
           APP_KEY: "base64:Z++HhObkg1plehwZlK6RGSRVi4uWPiUGRYFoDOt2/Ig="
@@ -95,13 +87,11 @@ jobs:
           entrypoint: phpdbg
           args: -qrr vendor/bin/phpunit --testsuite Feature --coverage-php=coverage/feature.cov
       - name: 'Merge coverage'
-        if: '!github.event.deleted'
         uses: docker://php:7.3-alpine
         with:
           entrypoint: phpdbg
           args: -qrr vendor/bin/phpcov merge --clover=feature.xml coverage/feature.cov
       - name: 'Upload CodeCov report'
-        if: '!github.event.deleted'
         uses: codecov/codecov-action@v1.0.2
         with:
           token: ${{secrets.CODECOV_TOKEN}}
