@@ -7,93 +7,93 @@ jobs:
     runs-on: ubuntu-latest
     if: '!github.event.deleted'
     steps:
-      - name: 'Checkout code'
-        uses: actions/checkout@master
-      - name: 'Composer install'
-        uses: MilesChou/composer-action@master
-        with:
-          args: install
-      - name: 'Run spec tests'
-        uses: docker://php:7.3-alpine
-        env:
-          APP_KEY: "base64:Z++HhObkg1plehwZlK6RGSRVi4uWPiUGRYFoDOt2/Ig="
-          DB_CONNECTION: "sqlite"
-          DB_DATABASE: "/tmp/acdc.sqlite"
-          LOG_CHANNEL: "errorlog"
-          APP_ENV: "testing"
-        with:
-          entrypoint: phpdbg
-          args: -qrr vendor/bin/phpspec run
-      - name: 'Merge coverage'
-        uses: docker://php:7.3-alpine
-        with:
-          entrypoint: phpdbg
-          args: -qrr vendor/bin/phpcov merge --clover=spec.xml coverage/spec.cov
-      - name: 'Upload CodeCov report'
-        uses: codecov/codecov-action@v1.0.2
-        with:
-          token: ${{secrets.CODECOV_TOKEN}}
-          file: ./spec.xml
-          flags: spec
+    - name: 'Checkout code'
+      uses: actions/checkout@master
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@master
+      with:
+        php-version: 7.2
+        # We're using phpdbg, we don't need a coverage extension.
+        coverage: none
+    - name: Install Dependencies
+      run: |
+        composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+    - name: 'Run spec tests'
+      env:
+        APP_KEY: "base64:Z++HhObkg1plehwZlK6RGSRVi4uWPiUGRYFoDOt2/Ig="
+        DB_CONNECTION: "sqlite"
+        DB_DATABASE: "/tmp/acdc.sqlite"
+        LOG_CHANNEL: "errorlog"
+        APP_ENV: "testing"
+      run: |
+        phpdbg -qrr vendor/bin/phpspec run
+    - name: 'Merge coverage'
+      run: |
+        phpdbg -qrr vendor/bin/phpcov merge --clover=spec.xml coverage/spec.cov
+    - name: 'Upload CodeCov report'
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: |
+        bash <(curl -s https://codecov.io/bash) -F spec -f spec.xml
 
   unit_tests:
     name: "Unit tests"
     runs-on: ubuntu-latest
     if: '!github.event.deleted'
     steps:
-      - name: 'Checkout code'
-        uses: actions/checkout@master
-      - name: 'Composer install'
-        uses: MilesChou/composer-action@master
-        with:
-          args: install
-      - name: 'Run unit tests'
-        uses: docker://php:7.3-alpine
-        with:
-          entrypoint: phpdbg
-          args: -qrr vendor/bin/phpunit --testsuite Unit --coverage-php=coverage/unit.cov
-      - name: 'Merge coverage'
-        uses: docker://php:7.3-alpine
-        with:
-          entrypoint: phpdbg
-          args: -qrr vendor/bin/phpcov merge --clover=unit.xml coverage/unit.cov
-      - name: 'Upload CodeCov report'
-        uses: codecov/codecov-action@v1.0.2
-        with:
-          token: ${{secrets.CODECOV_TOKEN}}
-          file: ./unit.xml
-          flags: unit
+    - name: 'Checkout code'
+      uses: actions/checkout@master
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@master
+      with:
+        php-version: 7.2
+        # We're using phpdbg, we don't need a coverage extension.
+        coverage: none
+    - name: Install Dependencies
+      run: |
+        composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+    - name: 'Run unit tests'
+      run: |
+        phpdbg -qrr vendor/bin/phpunit --testsuite Unit --coverage-php=coverage/unit.cov
+    - name: 'Merge coverage'
+      run: |
+        phpdbg -qrr vendor/bin/phpcov merge --clover=unit.xml coverage/unit.cov
+    - name: 'Upload CodeCov report'
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: |
+        bash <(curl -s https://codecov.io/bash) -F unit -f unit.xml
 
   feature_tests:
     name: "Feature tests"
     runs-on: ubuntu-latest
     if: '!github.event.deleted'
     steps:
-      - name: 'Checkout code'
-        uses: actions/checkout@master
-      - name: 'Composer install'
-        uses: MilesChou/composer-action@master
-        with:
-          args: install
-      - name: 'Run unit tests'
-        uses: docker://php:7.3-alpine
-        env:
-          APP_KEY: "base64:Z++HhObkg1plehwZlK6RGSRVi4uWPiUGRYFoDOt2/Ig="
-          DB_CONNECTION: "sqlite"
-          DB_DATABASE: "/tmp/acdc.sqlite"
-          LOG_CHANNEL: "errorlog"
-          APP_ENV: "testing"
-        with:
-          entrypoint: phpdbg
-          args: -qrr vendor/bin/phpunit --testsuite Feature --coverage-php=coverage/feature.cov
-      - name: 'Merge coverage'
-        uses: docker://php:7.3-alpine
-        with:
-          entrypoint: phpdbg
-          args: -qrr vendor/bin/phpcov merge --clover=feature.xml coverage/feature.cov
-      - name: 'Upload CodeCov report'
-        uses: codecov/codecov-action@v1.0.2
-        with:
-          token: ${{secrets.CODECOV_TOKEN}}
-          file: ./feature.xml
-          flags: feature
+    - name: 'Checkout code'
+      uses: actions/checkout@master
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@master
+      with:
+        php-version: 7.2
+        # We're using phpdbg, we don't need a coverage extension.
+        coverage: none
+    - name: Install Dependencies
+      run: |
+        composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+    - name: 'Run unit tests'
+      env:
+        APP_KEY: "base64:Z++HhObkg1plehwZlK6RGSRVi4uWPiUGRYFoDOt2/Ig="
+        DB_CONNECTION: "sqlite"
+        DB_DATABASE: "/tmp/acdc.sqlite"
+        LOG_CHANNEL: "errorlog"
+        APP_ENV: "testing"
+      run: |
+        phpdbg -qrr vendor/bin/phpunit --testsuite Feature --coverage-php=coverage/feature.cov
+    - name: 'Merge coverage'
+      run: |
+        phpdbg -qrr vendor/bin/phpcov merge --clover=feature.xml coverage/feature.cov
+    - name: 'Upload CodeCov report'
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: |
+        bash <(curl -s https://codecov.io/bash) -F feature -f feature.xml
