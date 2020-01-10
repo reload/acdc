@@ -34,7 +34,7 @@ jobs:
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: |
-        bash <(curl -s https://codecov.io/bash) -F spec -f spec.xml
+        bash <(curl -s https://codecov.io/bash) -F spec -f spec.xml -Z
 
   unit_tests:
     name: "Unit tests"
@@ -62,7 +62,7 @@ jobs:
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: |
-        bash <(curl -s https://codecov.io/bash) -F unit -f unit.xml
+        bash <(curl -s https://codecov.io/bash) -F unit -f unit.xml -Z
 
   feature_tests:
     name: "Feature tests"
@@ -96,4 +96,4 @@ jobs:
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: |
-        bash <(curl -s https://codecov.io/bash) -F feature -f feature.xml
+        bash <(curl -s https://codecov.io/bash) -F feature -f feature.xml -Z
