@@ -17,7 +17,7 @@ jobs:
         coverage: none
     - name: Install Dependencies
       run: |
-        composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+        composer install --no-interaction --no-progress
     - name: 'Run spec tests'
       env:
         APP_KEY: "base64:Z++HhObkg1plehwZlK6RGSRVi4uWPiUGRYFoDOt2/Ig="
@@ -51,7 +51,7 @@ jobs:
         coverage: none
     - name: Install Dependencies
       run: |
-        composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+        composer install --no-interaction --no-progress
     - name: 'Run unit tests'
       run: |
         phpdbg -qrr vendor/bin/phpunit --testsuite Unit --coverage-php=coverage/unit.cov
@@ -79,7 +79,7 @@ jobs:
         coverage: none
     - name: Install Dependencies
       run: |
-        composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+        composer install --no-interaction --no-progress
     - name: 'Run unit tests'
       env:
         APP_KEY: "base64:Z++HhObkg1plehwZlK6RGSRVi4uWPiUGRYFoDOt2/Ig="
