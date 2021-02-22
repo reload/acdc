@@ -1,19 +1,11 @@
-version: '2'
+version: '3.7'
 
 services:
   acdc:
-    image: php:7.2-alpine
-    working_dir:
-      /app
+    build: .
+    image: acdc:latest
+    # Mount in checked out code.
     volumes:
       - '.:/app'
-    command: "php -S 0.0.0.0:80 -t /app/public"
-    environment:
-      APP_URL: http://localhost
-      DB_CONNECTION: sqlite
-      DB_DATABASE: "/app/storage/app/acdc.sqlite"
-      CACHE_DRIVER: file
-      QUEUE_CONNECTION: sync
-      SESSION_DRIVER: file
-      SESSION_LIFETIME: 120
-
+    # Make docker create an init process.
+    init: true

@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+  acdc:
+    environment:
+      VIRTUAL_HOST: acdc.local
+      LOG_CHANNEL: errorlog
+      ACTIVECAMPAIGN_ACCOUNT: 1499693424850
+      ACTIVECAMPAIGN_TOKEN: a3bd19d614cd415d011162ca69dd8361cd334b3e6fdc45e0e46149368de28cf2bd82fa93
+      GOOGLE_CLIENT_ID: 796492649290-gnacap12h5nk3mpopoilaogfu2iqa38j.apps.googleusercontent.com
+      GOOGLE_CLIENT_SECRET: 9LpsdjunbRt1j2v83I_0qqd0
+      GOOGLE_REDIRECT: http://localhost:8000/callback
+      GOOGLE_SERVICE_ACCOUNT: |
+        {"type":"service_account","project_id":"acdc-reload","private_key_id":"2a235569464a080d9528a99eadd2dd64a52a0f2f","private_key":"-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCTQ/kawTGCWJ1z\nZsPbr58w8THiu0nCO/TVedFRObO94KONwP5b/R5F6S3nuMksUgbZeEdracfbqP1J\nNr6NxSXwFhfKk2Dct0xj978ChGvrx0gs+wg/x3Gzq+qklaMgvMRYuITYCjPBTMna\nD3X+4u22CCdFIGwWplnuq7Bzul6DvX+rawVibuVRmxTv/ZqKCxUE0qTFyBgcsMji\nccnNQkK0ovcphute0qWg1Gs94CN45Kgw/KaAc3O1cIpNvx1H+D1l13vMCZi51q3W\nI8XLphFOwh0Gt0+8I3nfaT7iQmf9YbhIRKc6nwNekWOloMnJT3eldEvbB1xLGsTD\nUq9NGvTBAgMBAAECggEAAI/5PGjzx7tvdz+DkKgOosvugp7wC8RhaZPrbMDEcP2J\nyVyk+ghlBlvDBKYu+j7iUt/5v5k76bDPHhGd+94OiHCYqNncDC685Wo2o/+KBxiT\n0/Rl2ELCcl7+DICr6rfu1OcIPpgYIVEyCYWu5+UxZsU4Y2wproLWT8YPBIugARc5\niErRyHZwEITIGUKUqpnnyk9IVqkuk5kIxqa4096Yicyegf5O2mbPpwPI82Zw+wzk\nPp2jnw8Sw0CnD4d3M9QosN2JxD3eUS76MhzT1Oh8c9MZI1LD86avvjgowdDzEWHF\nArQotjtK9HRB1jba8Jb0yY8oFHFvYtRveZvhbougAQKBgQDPM/BtCZy9ZZIibMU1\n4/R17r/PO7ceBmsozAwdu0ur/Bd+VZQQYeZwvh4JISN6JFluI7P8j/PzBQN7FUr0\nJ9ErzOs+Q5AiMBSyZlQvd6qgm7Je4mH9kkYjzkhXbrX0XQtKfqV/NKNGgEkWzJ/a\nM1AwEY9gP2yxUBKMRj+TmobwAQKBgQC18nfdc8vlKWdH8RbHO0l1mcE8+AidfR1i\nRWLpsvr/itXDD6dzDN1R7VtJ+1lX3McEeP5kgLZoWdOA4/pVIGwXS0WKcKap+qQn\nxliDpNBV4igbC7lPkFwWAuibh6qdzK2b4APNMpGFs5XVx2MJJksYo4ShWWxd7pbB\nkaW3saAEwQKBgCNC8oqL1TnCHFFxc0pNhd/ABrJstigM7ZWey/0PT7xwBUuBotX6\n4y2SnSfulMwHfZSpzMqRcPGNi98Za40LbaRnli0dcFzxE8Scd30wf0Af3wYYvpZZ\nm0gipdsDQ0HXx8EgtmdkfNjVohqYLigDDYVwp5a4lHXEa7OljNJAvPABAoGAOtki\ntci3QPaERjuPH39oghXp71tWBgIql9dTZ70Q+8ge3YlZopedmdsIdMRMIGPzJtov\nhbgvx06OXxjdpdznuR0Kb/2BmmbL42V+yY1sKOsOB7liBX7umdv0+iEGKSXDXTA2\nao8ZjEIKi2uC97mf/mcdBcbTiwoZTqBaFjDoTcECgYEAq2TsA73dUCRNyjsuNhUk\nzQ8Ra4JgTWi55k1LkvBI8xvUXxjYjPHy1kP3ij+q3gIZ8fTfQq8vjn36kOyoT8+9\nD5chOfdIQFmzS3z+Gmt57osLlJ5Mleaexh4/Ytashp3WsD/EdeXo8/Ov8tsZvHju\nl+JmoyKcfS99Gk3C7O3l6bA=\n-----END PRIVATE KEY-----\n","client_email":"sheets-updater@acdc-reload.iam.gserviceaccount.com","client_id":"112294579009475611095","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"https://www.googleapis.com/robot/v1/metadata/x509/sheets-updater%40acdc-reload.iam.gserviceaccount.com"}
+      DEAL_SHEETS: |
+          -
+            sheet: 1M2J8lC3K6PlQdSuh2DyNhNigzDfj6_iyQApAswVXi4U
+            tab: PageUno
+            localeTranslate: true
