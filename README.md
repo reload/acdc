@@ -1,5 +1,9 @@
 # ActiveCampaign Data Cruncher
 
+Small service that listens to webhooks from ActiveCampaign and syncs
+contact and deal data to specific Google Sheets. It also updates a
+custom field in AC with the average of 5 other custom fields.
+
 ## Env variable Configuration
 
 `ACTIVECAMPAIGN_ACCOUNT`: Account number at ActiveCampaign.
