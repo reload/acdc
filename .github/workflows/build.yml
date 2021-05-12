@@ -1,0 +1,45 @@
+on:
+  workflow_run:
+    workflows: ["Run tests"]
+    branches: [main]
+    types:
+      - completed
+
+jobs:
+  build:
+    name: Docker build and push
+    if: '!github.event.deleted'
+    if: >
+      ${{ !github.event.deleted &&
+      github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
+    - name: Bump version and push tag
+      uses: anothrNick/github-tag-action@master
+      id: version
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        WITH_V: false
+        DEFAULT_BUMP: patch
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@master
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        # Currently ghcr.io only supports a personal access token, so
+        # this is one from reload-deploy.
+        password: ${{ secrets.GHCR_TOKEN }}
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v2.4.0
+      with:
+        builder: ${{ steps.buildx.outputs.name }}
+        tags: |
+          ghcr.io/reload/acdc:latest
+          ghcr.io/reload/acdc:${{ steps.version.outputs.new_tag }}
+        push: true
