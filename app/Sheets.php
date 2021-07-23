@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Google_Service_Sheets;
-use Google_Service_Sheets_ValueRange;
+use Google\Service\Sheets as GoogleSheets;
+use Google\Service\Sheets\ValueRange;
 use RuntimeException;
 use Throwable;
 
@@ -12,11 +12,11 @@ class Sheets
 
     /**
      * Google Sheets client.
-     * @var \Google_Service_Sheets
+     * @var \Google\Service\Sheets
      */
     protected $sheets;
 
-    public function __construct(Google_Service_Sheets $sheets)
+    public function __construct(GoogleSheets $sheets)
     {
         $this->sheets = $sheets;
     }
@@ -110,15 +110,11 @@ class Sheets
      */
     protected function getValues(string $spreadsheetId, string $sheetId, bool $headerOnly = false)
     {
-        try {
-            return $this->sheets->spreadsheets_values->get(
-                $spreadsheetId,
-                sprintf("'%s'%s", $sheetId, $headerOnly ? '!1:1' : ''),
-                ['majorDimension' => 'ROWS']
-            );
-        } catch (Throwable $e) {
-            return null;
-        }
+        return $this->sheets->spreadsheets_values->get(
+            $spreadsheetId,
+            sprintf("'%s'%s", $sheetId, $headerOnly ? '!1:1' : ''),
+            ['majorDimension' => 'ROWS']
+        );
     }
 
     /**
@@ -138,7 +134,7 @@ class Sheets
         // USER_ENTERED depending on content, we'll use USER_ENTERED and
         // translate the decimal separator for numbers.
         $options = ['valueInputOption' => 'USER_ENTERED'];
-        $values = new Google_Service_Sheets_ValueRange(['values' => [$row]]);
+        $values = new ValueRange(['values' => [$row]]);
         $result = $this->sheets->spreadsheets_values->append(
             $spreadsheetId,
             sprintf("'%s'!%s%d:%s%d", $sheetId, 'A', 1,  $this->columnLetter(count($row)), 1),
@@ -162,7 +158,7 @@ class Sheets
     public function updateRow(string $spreadsheetId, string $sheetId, int $rowNum, array $row)
     {
         $options = ['valueInputOption' => 'USER_ENTERED'];
-        $values = new Google_Service_Sheets_ValueRange(['values' => [$row]]);
+        $values = new ValueRange(['values' => [$row]]);
         $result = $this->sheets->spreadsheets_values->update(
             $spreadsheetId,
             sprintf("'%s'!%s%d:%s%d", $sheetId, 'A', $rowNum, $this->columnLetter(count($row)), $rowNum),

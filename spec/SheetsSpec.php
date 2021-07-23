@@ -4,16 +4,16 @@ namespace spec\App;
 
 use App\Sheets;
 use Exception;
-use Google_Service_Sheets;
-use Google_Service_Sheets_Resource_Spreadsheets;
-use Google_Service_Sheets_Resource_SpreadsheetsValues;
-use Google_Service_Sheets_ValueRange;
+use Google\Service\Sheets as GoogleSheets;
+use Google\Service\Sheets\Resource\Spreadsheets;
+use Google\Service\Sheets\Resource\SpreadsheetsValues;
+use Google\Service\Sheets\ValueRange;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class SheetsSpec extends ObjectBehavior
 {
-    function let(Google_Service_Sheets $sheets)
+    function let(GoogleSheets $sheets)
     {
         $this->beConstructedWith($sheets);
     }
@@ -24,8 +24,8 @@ class SheetsSpec extends ObjectBehavior
     }
 
     function it_should_check_for_sheet_existence(
-        Google_Service_Sheets $sheets,
-        Google_Service_Sheets_Resource_Spreadsheets $spreadsheets
+        GoogleSheets $sheets,
+        Spreadsheets $spreadsheets
     ) {
         $sheet = (object) [];
         $spreadsheets->get('spreadsheet-id')->willReturn($sheet);
@@ -37,8 +37,8 @@ class SheetsSpec extends ObjectBehavior
     }
 
     function it_should_list_pages_in_sheet(
-        Google_Service_Sheets $sheets,
-        Google_Service_Sheets_Resource_Spreadsheets $spreadsheets
+        GoogleSheets $sheets,
+        Spreadsheets $spreadsheets
     ) {
         // fake $sheets->spreadsheets->get(id)->sheets[X]->properties->title.
         $sheet = (object) ['sheets' => [
@@ -52,8 +52,8 @@ class SheetsSpec extends ObjectBehavior
     }
 
     function it_should_return_sheet_header(
-        Google_Service_Sheets $sheets,
-        Google_Service_Sheets_Resource_SpreadsheetsValues $values
+        GoogleSheets $sheets,
+        SpreadsheetsValues $values
     ) {
         $valuesObj = (object) [
             'values' => [
@@ -69,8 +69,8 @@ class SheetsSpec extends ObjectBehavior
     }
 
     function it_should_return_sheet_data(
-        Google_Service_Sheets $sheets,
-        Google_Service_Sheets_Resource_SpreadsheetsValues $values
+        GoogleSheets $sheets,
+        SpreadsheetsValues $values
     ) {
         $rows = [
             ['header 1', 'header 2', 'header 3'],
@@ -88,10 +88,10 @@ class SheetsSpec extends ObjectBehavior
     }
 
     function it_should_append_row(
-        Google_Service_Sheets $sheets,
-        Google_Service_Sheets_Resource_SpreadsheetsValues $values
+        GoogleSheets $sheets,
+        SpreadsheetsValues $values
     ) {
-        $valueRange = new Google_Service_Sheets_ValueRange(['values' => [['one', 'two']]]);
+        $valueRange = new ValueRange(['values' => [['one', 'two']]]);
 
         $values->append(
             'spreadsheet-id',
@@ -104,10 +104,10 @@ class SheetsSpec extends ObjectBehavior
     }
 
     function it_should_update_row(
-        Google_Service_Sheets $sheets,
-        Google_Service_Sheets_Resource_SpreadsheetsValues $values
+        GoogleSheets $sheets,
+        SpreadsheetsValues $values
     ) {
-        $valueRange = new Google_Service_Sheets_ValueRange(['values' => [['one', 'two']]]);
+        $valueRange = new ValueRange(['values' => [['one', 'two']]]);
 
         $values->update(
             'spreadsheet-id',
