@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\ActiveCampaign;
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
+use Google\Client as GoogleClient;
+use Google\Service\Sheets;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,19 +35,20 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
-        $this->app->bind(\Google_Client::class, function ($app) {
-            $client = new \Google_Client();
+        $this->app->bind(GoogleClient::class, function ($app) {
+            $client = new GoogleClient();
             $client->setApplicationName('ACDC');
-            $client->setScopes([\Google_Service_Sheets::SPREADSHEETS]);
+            $client->setScopes([Sheets::SPREADSHEETS]);
             $client->setAccessType('offline');
 
             //$client->setAuthConfig(json_decode($jsonAuth, true));
+            print_r(env('GOOGLE_SERVICE_ACCOUNT'));
             $client->setAuthConfig(json_decode(env('GOOGLE_SERVICE_ACCOUNT'), true));
             return $client;
         });
 
-        $this->app->bind(\Google_Service_Sheets::class, function ($app) {
-            return new \Google_Service_Sheets($app->make(\Google_Client::class));
+        $this->app->bind(Sheets::class, function ($app) {
+            return new Sheets($app->make(GoogleClient::class));
         });
     }
 }
