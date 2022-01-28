@@ -3149,20 +3149,23 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.23.0",
+            "version": "v1.24.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
-                "reference": "46cd95797e9df938fdd2b03693b5fca5e64b01ce"
+                "reference": "30885182c981ab175d4d034db0f6f469898070ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/46cd95797e9df938fdd2b03693b5fca5e64b01ce",
-                "reference": "46cd95797e9df938fdd2b03693b5fca5e64b01ce",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/30885182c981ab175d4d034db0f6f469898070ab",
+                "reference": "30885182c981ab175d4d034db0f6f469898070ab",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.1"
+            },
+            "provide": {
+                "ext-ctype": "*"
             },
             "suggest": {
                 "ext-ctype": "For best performance"
@@ -3208,7 +3211,7 @@
                 "portable"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.23.0"
+                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.24.0"
             },
             "funding": [
                 {
@@ -3224,7 +3227,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-19T12:13:01+00:00"
+            "time": "2021-10-20T20:35:02+00:00"
         },
         {
             "name": "symfony/polyfill-iconv",
@@ -4254,16 +4257,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v4.4.36",
+            "version": "v4.4.37",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "a19f7c44ba665fa9d9d415cc4493361381b93f9b"
+                "reference": "d7f637cc0f0cc14beb0984f2bb50da560b271311"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/a19f7c44ba665fa9d9d415cc4493361381b93f9b",
-                "reference": "a19f7c44ba665fa9d9d415cc4493361381b93f9b",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/d7f637cc0f0cc14beb0984f2bb50da560b271311",
+                "reference": "d7f637cc0f0cc14beb0984f2bb50da560b271311",
                 "shasum": ""
             },
             "require": {
@@ -4305,7 +4308,7 @@
             "description": "Loads and dumps YAML files",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/yaml/tree/v4.4.36"
+                "source": "https://github.com/symfony/yaml/tree/v4.4.37"
             },
             "funding": [
                 {
@@ -4321,7 +4324,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-11-25T16:40:00+00:00"
+            "time": "2022-01-24T20:11:01+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -6709,5 +6712,5 @@
         "php": "^7.1.3"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }
