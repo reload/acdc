@@ -31,10 +31,11 @@ jobs:
       run: |
         phpdbg -qrr vendor/bin/phpcov merge --clover=spec.xml coverage/spec.cov
     - name: 'Upload CodeCov report'
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      run: |
-        bash <(curl -s https://codecov.io/bash) -F spec -f spec.xml -Z
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./spec.xml
+        flags: spec
+        fail_ci_if_error: true
 
   unit_tests:
     name: "Unit tests"
@@ -59,10 +60,11 @@ jobs:
       run: |
         phpdbg -qrr vendor/bin/phpcov merge --clover=unit.xml coverage/unit.cov
     - name: 'Upload CodeCov report'
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      run: |
-        bash <(curl -s https://codecov.io/bash) -F unit -f unit.xml -Z
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./unit.xml
+        flags: unit
+        fail_ci_if_error: true
 
   feature_tests:
     name: "Feature tests"
@@ -93,7 +95,8 @@ jobs:
       run: |
         phpdbg -qrr vendor/bin/phpcov merge --clover=feature.xml coverage/feature.cov
     - name: 'Upload CodeCov report'
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      run: |
-        bash <(curl -s https://codecov.io/bash) -F feature -f feature.xml -Z
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./feature.xml
+        flags: feature
+        fail_ci_if_error: true
