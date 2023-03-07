@@ -36,6 +36,8 @@ jobs:
         files: ./spec.xml
         flags: spec
         fail_ci_if_error: true
+        # Needed for Dependabot PRs.
+        token: ${{ secrets.CODECOV_TOKEN }}
 
   unit_tests:
     name: "Unit tests"
@@ -65,6 +67,8 @@ jobs:
         files: ./unit.xml
         flags: unit
         fail_ci_if_error: true
+        # Needed for Dependabot PRs.
+        token: ${{ secrets.CODECOV_TOKEN }}
 
   feature_tests:
     name: "Feature tests"
@@ -100,3 +104,5 @@ jobs:
         files: ./feature.xml
         flags: feature
         fail_ci_if_error: true
+        # Needed for Dependabot PRs.
+        token: ${{ secrets.CODECOV_TOKEN }}
