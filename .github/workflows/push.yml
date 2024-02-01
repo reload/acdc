@@ -31,7 +31,7 @@ jobs:
       run: |
         phpdbg -qrr vendor/bin/phpcov merge --clover=spec.xml coverage/spec.cov
     - name: 'Upload CodeCov report'
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         files: ./spec.xml
         flags: spec
@@ -62,7 +62,7 @@ jobs:
       run: |
         phpdbg -qrr vendor/bin/phpcov merge --clover=unit.xml coverage/unit.cov
     - name: 'Upload CodeCov report'
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         files: ./unit.xml
         flags: unit
@@ -99,7 +99,7 @@ jobs:
       run: |
         phpdbg -qrr vendor/bin/phpcov merge --clover=feature.xml coverage/feature.cov
     - name: 'Upload CodeCov report'
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         files: ./feature.xml
         flags: feature
