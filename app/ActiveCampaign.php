@@ -11,7 +11,7 @@ class ActiveCampaign
     protected $account;
     protected $token;
 
-    public function __construct(Client $client, string $account = null, string $token = null)
+    public function __construct(Client $client, ?string $account = null, ?string $token = null)
     {
         $this->client = $client;
         $this->account = (string) $account;
@@ -82,7 +82,7 @@ class ActiveCampaign
     public function updateDealCustomField($dealId, $fieldName, $value)
     {
         if (!preg_match('/^custom_field_(\d+)$/', $fieldName, $matches)) {
-            throw new RuntimeException('Bad custom field id: ' . $id);
+            throw new RuntimeException('Bad custom field id: ' . $fieldName);
         }
         $fieldId = $matches[1];
 
@@ -182,13 +182,13 @@ class ActiveCampaign
         $fieldData = $this->call('GET', 'fields');
 
         if (!isset($fieldData['fields'])) {
-            throw new RuntimeException('Could not get contact field definitions on ' . $contactId);
+            throw new RuntimeException('Could not get contact field definitions');
         }
 
         $fields = [];
         foreach ($fieldData['fields'] as $field) {
             if (!isset($field['id']) || !isset($field['perstag'])) {
-                throw new RuntimeException('Malformed contact field definition reply on ' . $contactId);
+                throw new RuntimeException('Malformed contact field definition reply');
             }
             $fields[$field['id']] = 'field.' . strtolower($field['perstag']);
         }

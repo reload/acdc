@@ -13,7 +13,11 @@ use Tests\TestCase;
 
 class UpdateContactSheetsTest extends TestCase
 {
-    public function setUp() : void
+    protected $ac;
+    protected $writer;
+    protected $updater;
+
+    protected function setUp() : void
     {
         parent::setUp();
         // Suppress log output.
